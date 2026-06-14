@@ -77,11 +77,40 @@ Copia el archivo de ejemplo para crear tus variables reales:
 ```bash
 cp .env.example .env
 ```
-Abre el archivo `.env` (`nano .env`) y personaliza las variables importantes:
-- **`INITIAL_SUPERADMIN_EMAIL`** y **`INITIAL_SUPERADMIN_PASSWORD`**: Credenciales de tu usuario principal.
-- **`AUTH_SECRET`**: Genera un hash seguro (`openssl rand -base64 32`).
-- **`NEXT_PUBLIC_APP_URL`**: La URL pública donde vivirá tu aplicación (ej. `https://crm.tudominio.com`).
-- **`CRON_SECRET`**: Una contraseña aleatoria para proteger la URL que lanza las tareas automáticas (cron).
+Abre el archivo `.env` (`nano .env`) y personaliza las variables importantes. A continuación se presentan comandos útiles en Linux para generar contraseñas seguras y llaves criptográficas requeridas en el archivo:
+
+#### Base de Datos
+- **`DATABASE_URL`**: Por defecto usa `postgres:postgres`. Para cambiar la contraseña de la base de datos a algo seguro, puedes generar un password con:
+  ```bash
+  openssl rand -base64 16
+  ```
+  *(Nota: Si cambias la contraseña en `DATABASE_URL`, asegúrate de actualizarla también en tu `docker-compose.yml` si levantas PostgreSQL desde ahí).*
+
+#### Credenciales
+- **`INITIAL_SUPERADMIN_EMAIL`** y **`INITIAL_SUPERADMIN_PASSWORD`**: Credenciales de tu usuario principal. Puedes generar una contraseña fuerte con:
+  ```bash
+  openssl rand -base64 12
+  ```
+
+#### Secretos de Aplicación
+- **`AUTH_SECRET`**: Secreto usado por Auth.js (NextAuth) para encriptar los JWT. Genera uno con:
+  ```bash
+  openssl rand -base64 32
+  ```
+- **`CRON_SECRET`**: Contraseña aleatoria para proteger los endpoints que ejecutan tareas automáticas (cron). Puedes generar una igual que arriba:
+  ```bash
+  openssl rand -hex 32
+  ```
+
+#### Llaves para Notificaciones Push (VAPID)
+Para que funcionen las notificaciones en el navegador, debes generar un par de llaves pública y privada (VAPID). Si tienes Node instalado en tu servidor, ejecuta:
+```bash
+npx web-push generate-vapid-keys
+```
+Copia el resultado en `NEXT_PUBLIC_VAPID_PUBLIC_KEY` y `VAPID_PRIVATE_KEY`.
+
+#### Dominio
+- **`NEXT_PUBLIC_APP_URL`**: La URL pública donde vivirá tu aplicación (ej. `https://crm.tudominio.com`). No olvides cambiarla para que el Service Worker y OAuth funcionen correctamente.
 
 ### 3. Levantar la Infraestructura (Docker)
 Inicia los contenedores (PostgreSQL + Servidor Next.js). La primera vez, esto descargará las imágenes y compilará la aplicación.
