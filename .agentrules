@@ -1,0 +1,28 @@
+# Proyecto: CRM de la Vida
+# Reglas de Diseño y Desarrollo para Agentes AI
+
+## 1. Diseño UX/UI para Neurodivergentes (TDAH)
+- **Tema Claro Obligatorio**: No usar fondos negros bajo ninguna circunstancia. Usar fondos blancos o colores pasteles muy claros.
+- **Sin Bordes Redondeados**: Todo debe tener bordes afilados. En Tailwind, asegúrate de aplicar `rounded-none` a botones, tarjetas, inputs, modales, etc. Nunca uses `rounded`, `rounded-md`, `rounded-lg`, o `rounded-full` (a menos que sea estrictamente para avatares circulares de usuario si se pide explícitamente, pero por defecto no).
+- **Diseño Mobile-First**: Todo el desarrollo debe pensar primero en pantallas móviles. Usar `md:`, `lg:` sólo para adaptar a pantallas más grandes.
+- **Reducción de Carga Cognitiva**: UI limpia, minimalista. Mucho espacio en blanco (`gap`, `padding`, `margin` amplios). Información particionada en pasos en lugar de formularios gigantes.
+
+## 2. Gamificación
+- Proveer siempre feedback visual inmediato para las acciones del usuario.
+- El sistema recompensará por la ejecución de tareas.
+
+## 3. Stack Tecnológico
+- Frontend / Backend: Next.js (App Router).
+- CSS: Tailwind CSS (sin dependencias adicionales de UI a menos que sean necesarias para componentes complejos y cumplan las reglas de diseño).
+- Base de Datos: PostgreSQL via Prisma.
+- Plataforma: Progressive Web App (PWA) con notificaciones Push (usando next-pwa y Service Workers).
+- Despliegue: Docker y Docker Compose.
+
+## 4. Arquitectura
+- Multi-tenant: La información debe estar siempre segmentada por "Tenant" (organización/espacio).
+- Roles de usuario soportados: System Admin, Tenant Admin, User.
+
+## 5. Entorno y Despliegue (DevOps / Local)
+- En este host, para cualquier funcionalidad o servicio, debes priorizar usar Docker.
+- **SIEMPRE usa `sudo`** al interactuar con Docker en este host para levantar contenedores o ejecutar comandos (ejemplo: `sudo docker compose up --build -d`).
+\n- Maintain the README.md updated after any structural changes to the architecture or dependencies.

@@ -1,0 +1,489 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  TENANT_ADMIN
+  USER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum ThresholdType {
+  TOTAL_TASKS
+  TOTAL_POINTS
+  STREAK_DAYS
+}
+
+enum KudoType {
+  GREAT_JOB
+  THANK_YOU
+  TEAM_PLAYER
+  ON_FIRE
+  STAR
+  HIGH_FIVE
+  MVP
+  COFFEE
+}
+
+model Tenant {
+  id               String            @id @default(uuid())
+  name             String
+  users            TenantUser[]
+  projects         Project[]
+  categories       Category[]
+  tasks            Task[]
+  userStats        UserStats[]
+  userAchievements UserAchievement[]
+  contacts         Contact[]
+  contactInteractions ContactInteraction[]
+  contactCategories ContactCategory[]
+  financeCategories FinanceCategory[]
+  transactions     Transaction[]
+  kudos            Kudo[]
+  timezone         String            @default("America/Bogota")
+  country          String?
+  currency         String            @default("USD")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model TenantUser {
+  id        String   @id @default(uuid())
+  tenantId  String
+  userId    String
+  role      Role     @default(USER)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, userId])
+}
+
+model User {
+  id               String            @id @default(uuid())
+  name             String?
+  email            String?           @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  isSuperAdmin     Boolean           @default(false)
+  tenants          TenantUser[]
+  tasks            Task[]            @relation("AssignedTasks")
+  createdTasks     Task[]            @relation("CreatedTasks")
+  rewards          UserReward[]
+  accounts         Account[]
+  sessions         Session[]
+  userStats        UserStats[]
+  userAchievements UserAchievement[]
+  contacts         Contact[]
+  contactInteractions ContactInteraction[]
+  transactions     Transaction[]
+  pushSubscriptions PushSubscription[]
+  notifications    Notification[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  taskCollaborations TaskCollaborator[]
+  assignedSubtasks   Subtask[]         @relation("SubtaskAssignedTo")
+  completedSubtasks  Subtask[]         @relation("SubtaskCompletedBy")
+  kudosSent          Kudo[]            @relation("KudoSender")
+  kudosReceived      Kudo[]            @relation("KudoReceiver")
+  notificationSoundsEnabled Boolean    @default(true)
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+  budgets     Budget[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Category {
+  id       String @id @default(uuid())
+  name     String
+  color    String
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tasks    Task[]
+  recurringTemplates RecurringTaskTemplate[]
+}
+
+model Task {
+  id              String      @id @default(uuid())
+  title           String
+  description     String?
+  points          Int         @default(10)
+  isRecurring     Boolean     @default(false)
+  cronRule        String?
+  status          TaskStatus  @default(TODO)
+  projectId       String?
+  project         Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tenantId        String
+  tenant          Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  categoryId      String?
+  category        Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  assignedTo      String?
+  assignee        User?       @relation("AssignedTasks", fields: [assignedTo], references: [id], onDelete: SetNull)
+  createdByUserId String?
+  creator         User?       @relation("CreatedTasks", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  dueDate         DateTime?
+  dueTime         String?
+  dueTimeReminderSentAt DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  subtasks        Subtask[]
+  collaborators   TaskCollaborator[]
+  
+  recurringTemplateId      String?
+  recurrenceOccurrenceDate DateTime?
+
+  recurringTemplate RecurringTaskTemplate? @relation(fields: [recurringTemplateId], references: [id], onDelete: SetNull)
+}
+
+model TaskCollaborator {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  addedAt   DateTime @default(now())
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+}
+
+model Subtask {
+  id          String   @id @default(cuid())
+  taskId      String
+  title       String
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  order       Int      @default(0)
+  createdAt         DateTime @default(now())
+  dueDate           DateTime?
+  assignedToUserId  String?
+  completedByUserId String?
+  
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assignedTo  User?    @relation("SubtaskAssignedTo", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+  completedBy User?    @relation("SubtaskCompletedBy", fields: [completedByUserId], references: [id], onDelete: SetNull)
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  name      String
+  amount    Float
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserReward {
+  id        String   @id @default(uuid())
+  points    Int
+  reason    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model UserStats {
+  id                 String    @id @default(uuid())
+  userId             String
+  tenantId           String
+  totalPoints        Int       @default(0)
+  collaborationPoints Int      @default(0)
+  currentLevel       Int       @default(1)
+  currentStreak      Int       @default(0)
+  longestStreak      Int       @default(0)
+  lastCompletionDate DateTime?
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant             Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+}
+
+model Achievement {
+  id               String            @id @default(uuid())
+  code             String            @unique
+  title            String
+  description      String
+  icon             String
+  thresholdValue   Int
+  thresholdType    ThresholdType
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  achievementId String
+  tenantId      String
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  tenant        Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId, tenantId])
+}
+
+// ==========================================
+// MÓDULO DE CONTACTOS
+// ==========================================
+
+model Contact {
+  id                    String    @id @default(cuid())
+  organizationId        String    @map("tenant_id")
+  createdByUserId       String
+  name                  String
+  relationshipType      String    // DEPRECATED: usar contactCategoryId
+  phone                 String?
+  email                 String?
+  notes                 String?   @db.Text
+  lastContactedAt       DateTime?
+  followUpFrequencyDays Int?
+  contactCategoryId     String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  interactions ContactInteraction[]
+  
+  tenant    Tenant @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy User   @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  category  ContactCategory? @relation(fields: [contactCategoryId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([createdByUserId])
+}
+
+model ContactCategory {
+  id             String   @id @default(cuid())
+  organizationId String   @map("tenant_id")
+  name           String
+  color          String
+  createdAt      DateTime @default(now())
+
+  contacts Contact[]
+  tenant   Tenant @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+model ContactInteraction {
+  id              String   @id @default(cuid())
+  contactId       String
+  organizationId  String   @map("tenant_id")
+  createdByUserId String
+  type            InteractionType
+  notes           String?  @db.Text
+  interactionDate DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tenant    Tenant  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy User    @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([organizationId])
+}
+
+enum InteractionType {
+  LLAMADA
+  MENSAJE
+  REUNION
+  EVENTO
+  OTRO
+}
+
+// ==========================================
+// MÓDULO DE FINANZAS
+// ==========================================
+
+model FinanceCategory {
+  id             String      @id @default(cuid())
+  organizationId String      @map("tenant_id")
+  name           String
+  type           FinanceType
+  color          String
+  createdAt      DateTime    @default(now())
+
+  transactions Transaction[]
+  tenant       Tenant @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+model Transaction {
+  id                String   @id @default(cuid())
+  organizationId    String   @map("tenant_id")
+  createdByUserId   String
+  financeCategoryId String
+  amount            Decimal  @db.Decimal(12, 2)
+  description       String?
+  transactionDate   DateTime @default(now())
+  createdAt         DateTime @default(now())
+
+  category  FinanceCategory @relation(fields: [financeCategoryId], references: [id], onDelete: Cascade)
+  tenant    Tenant          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy User            @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([financeCategoryId])
+}
+
+enum FinanceType {
+  INGRESO
+  GASTO
+}
+
+// ==========================================
+// MÓDULO DE PUSH NOTIFICATIONS
+// ==========================================
+
+model PushSubscription {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String   @default("legacy")
+  endpoint       String   @unique
+  p256dh         String
+  auth           String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Notification {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  type           NotificationType
+  title          String
+  body           String
+  link           String?
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationType {
+  FOLLOW_UP_REMINDER
+  TASK_DUE_SOON
+  ACHIEVEMENT_UNLOCKED
+  KUDO_RECEIVED
+  RECURRING_TASK_DUE
+}
+
+model RecurringTaskTemplate {
+  id                String   @id @default(cuid())
+  organizationId    String
+  createdByUserId   String
+  title             String
+  description       String?
+  categoryId        String?
+  points            Int      @default(10)
+  assignedToUserId  String?           // responsable principal (opcional)
+  
+  rrule             String            // string RRULE, ej. "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"
+  startDate         DateTime          // primera fecha posible de ocurrencia
+  endDate           DateTime?         // fecha límite de la serie (opcional)
+  maxOccurrences    Int?              // alternativa a endDate (opcional)
+  dueTime           String?
+  
+  reminderMinutesBefore Int?          // ej. 60 = recordar 1h antes de "vencer"
+  
+  isActive          Boolean  @default(true)  // pausar sin eliminar
+  lastGeneratedDate DateTime?         // última fecha para la que ya se generó instancia
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  category          Category? @relation(fields: [categoryId], references: [id])
+  subtaskTemplates  RecurringSubtaskTemplate[]
+  generatedTasks    Task[]
+}
+
+model RecurringSubtaskTemplate {
+  id                      String @id @default(cuid())
+  recurringTaskTemplateId String
+  title                   String
+  order                   Int    @default(0)
+  
+  template RecurringTaskTemplate @relation(fields: [recurringTaskTemplateId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// MÓDULO DE RECONOCIMIENTOS (KUDOS)
+// ==========================================
+
+model Kudo {
+  id              String   @id @default(cuid())
+  organizationId  String   @map("tenant_id")
+  fromUserId      String
+  toUserId        String
+  type            KudoType
+  message         String?  @db.Text
+  isPublic        Boolean  @default(true)
+  relatedTaskId   String?
+  relatedSubtaskId String?
+  createdAt       DateTime @default(now())
+
+  fromUser User   @relation("KudoSender", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User   @relation("KudoReceiver", fields: [toUserId], references: [id], onDelete: Cascade)
+  tenant   Tenant @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([toUserId])
+}
