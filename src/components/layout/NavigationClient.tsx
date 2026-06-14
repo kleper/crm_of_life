@@ -161,8 +161,10 @@ export default function NavigationClient({ canManage, userName, userTenants, act
               </Link>
               
               <Link href="/settings/categories" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${isActive('/settings/categories') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
-                <span className="opacity-70">🏷️</span>
-                Categorías
+                <span className="w-5 flex justify-center text-lg">🏷️</span> Categorías
+              </Link>
+              <Link href="/settings/notifications" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${isActive('/settings/notifications') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <span className="w-5 flex justify-center text-lg">🔔</span> Notificaciones
               </Link>
 
               {isSuperAdmin && (

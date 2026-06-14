@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { ConnectionStatusBanner } from "../ConnectionStatusBanner";
 import { getUnreadNotificationsCount } from "@/features/notifications/actions";
 import NotificationSoundListener from "./NotificationSoundListener";
+import { PushSubscriptionGuardian } from "../PushSubscriptionGuardian";
 
 const prisma = new PrismaClient();
 
@@ -52,9 +53,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         unreadCount={unreadCount}
       />
       
-      <main className="flex-1 overflow-y-auto pb-16 md:pb-0 flex flex-col relative">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-16 md:pb-0 flex flex-col relative">
         <ConnectionStatusBanner />
         <NotificationSoundListener soundsEnabled={soundsEnabled} />
+        <PushSubscriptionGuardian />
         {children}
       </main>
     </div>

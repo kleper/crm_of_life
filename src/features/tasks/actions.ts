@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { PrismaClient, TaskStatus, ThresholdType } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { calculateLevel } from "@/lib/gamification"
-import { sendPushNotification } from "@/lib/push"
+import { sendPushToUser } from "@/lib/push"
 
 const prisma = new PrismaClient()
 
@@ -110,19 +110,11 @@ export async function createTask(formData: FormData) {
 
   // Enviar Push Notification
   if (task.assignedTo) {
-    const subs = await prisma.pushSubscription.findMany({
-      where: { userId: task.assignedTo }
+    await sendPushToUser(task.assignedTo, {
+      title: "Nueva Tarea Asignada", 
+      body: task.title, 
+      link: "/tasks"
     });
-    for (const sub of subs) {
-      try {
-        await sendPushNotification(
-          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-          { title: "Nueva Tarea Asignada", body: task.title, url: "/tasks" }
-        );
-      } catch (e) {
-        console.error("Failed to send push notification", e);
-      }
-    }
   }
 
   revalidatePath("/tasks")

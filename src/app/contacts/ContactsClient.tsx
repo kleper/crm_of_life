@@ -36,8 +36,8 @@ export default function ContactsClient({ initialContacts, categories }: { initia
   return (
     <div>
       {/* Search and Add */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative w-64">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="relative w-full md:w-64">
           <input 
             type="text" 
             placeholder="Buscar contactos..." 
@@ -45,7 +45,7 @@ export default function ContactsClient({ initialContacts, categories }: { initia
           />
           <span className="absolute left-3 top-2 text-slate-400">🔍</span>
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+        <Button variant="primary" onClick={() => setIsModalOpen(true)} className="w-full md:w-auto whitespace-nowrap">
           + Nuevo Contacto
         </Button>
       </div>

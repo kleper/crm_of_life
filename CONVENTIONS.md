@@ -23,3 +23,16 @@
 *   Todo el mutado de estado debe realizarse vía Server Actions en `src/features/<modulo>/actions.ts`.
 *   Toda acción debe verificar `tenantId` antes de ejecutar cambios, leyendo exclusivamente de la sesión segura del servidor.
 *   Uso de componentes UI compartidos de `src/components/ui/` es obligatorio.
+
+## 4. Diseño Responsivo y Breakpoints (Mobile-First)
+*   **Checklist de Pruebas Obligatorio:** Todo componente nuevo o modificado debe ser verificado en los siguientes anchos de viewport:
+    *   `320px` (Mínimo soportado, ej. iPhone SE antiguo)
+    *   `375px` (Móvil promedio estándar)
+    *   `414px` (Móvil grande)
+    *   `768px` (Tablet Portrait / `md:`)
+    *   `1024px` (Tablet Landscape o Desktop pequeño / `lg:`)
+*   **Regla de Desbordamiento:** NINGÚN elemento puede causar scroll horizontal de la página completa. El layout raíz debe tener `overflow-x-hidden` como red de seguridad. Si se requiere scroll horizontal (ej. Carrusel o Kanban), debe usarse `overflow-x-auto`, un ancho máximo de `100%` o `100vw`, y preferiblemente `scroll-snap-type: x mandatory` contenido *dentro* de su propio componente.
+*   **Grillas (Grids):**
+    *   Por defecto en móvil (`<640px`), las grillas pesadas con mucho texto deben usar `grid-cols-1`.
+    *   Solo se permite `grid-cols-2` en móvil si el contenido está garantizado a no truncarse y caber en ~140px por columna.
+*   **Safe Area:** En mobile, el padding inferior global debe prever el `env(safe-area-inset-bottom)` de los dispositivos sin botones físicos.

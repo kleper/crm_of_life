@@ -76,3 +76,15 @@ export async function markAllAsRead() {
 
   revalidatePath("/notifications");
 }
+
+export async function toggleNotificationSounds(enabled: boolean) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+  
+  await prisma.user.update({
+    where: { id: session.user.id },
+    data: { notificationSoundsEnabled: enabled }
+  });
+
+  revalidatePath("/settings/notifications");
+}

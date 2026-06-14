@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { sendPushNotification } from "@/lib/push";
+import { sendPushToUser } from "@/lib/push";
 
 const prisma = new PrismaClient();
 
@@ -50,24 +50,23 @@ export async function GET(request: Request) {
         const diffMins = taskTotalMins - nowTotalMins;
         
         if (diffMins >= 0 && diffMins <= 15) {
-          if (task.assignedTo) {
-            const subs = await prisma.pushSubscription.findMany({
-              where: { userId: task.assignedTo }
-            });
-            for (const sub of subs) {
-              try {
-                await sendPushNotification(
-                  { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                  { title: `⏳ Vence pronto: ${task.title}`, body: `A las ${task.dueTime}`, url: "/tasks" }
-                );
-              } catch (e) {
-                console.error("Failed to send push notification", e);
-              }
+          const targetUserId = task.assignedTo;
+          if (targetUserId) {
+            try {
+              await sendPushToUser(targetUserId, {
+                title: "Recordatorio de Tarea",
+                body: `La tarea "${task.title}" vence en menos de 1 hora.`,
+                link: `/tasks`,
+                soundType: "default"
+              });
+            } catch (e) {
+              console.error("Push failed for user", targetUserId, e);
             }
+          }
             
             await prisma.notification.create({
               data: {
-                userId: task.assignedTo,
+                userId: task.assignedTo!,
                 organizationId: tenant.id,
                 type: "TASK_DUE_SOON",
                 title: `Vence pronto: ${task.title}`,

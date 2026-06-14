@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 import { auth } from "@/auth";
 import { KudoType } from "@prisma/client";
 import { awardCollaborationPoints } from "@/lib/gamification";
-import { sendPushNotification } from "@/lib/push";
+import { sendPushToUser } from "@/lib/push";
 import { getKudoOptions } from "@/lib/kudos";
 
 const KUDOS_DAILY_LIMIT = 3;
@@ -116,25 +116,12 @@ export async function sendKudo({
   const kudoMeta = options.find(o => o.type === type);
   const kudoLabel = kudoMeta ? kudoMeta.label : "Reconocimiento";
 
-  const subs = await prisma.pushSubscription.findMany({
-    where: { userId: toUserId }
+  await sendPushToUser(toUserId, {
+    title: "🏆 ¡Nuevo reconocimiento!",
+    body: `${senderName} te envió: ${kudoLabel} ${kudoMeta?.icon || ""}`,
+    link: "/kudos",
+    soundType: "kudo"
   });
-
-  for (const sub of subs) {
-    try {
-      await sendPushNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        { 
-          title: "🏆 ¡Nuevo reconocimiento!", 
-          body: `${senderName} te envió: ${kudoLabel} ${kudoMeta?.icon || ""}`, 
-          url: "/kudos",
-          soundType: "kudo"
-        }
-      );
-    } catch (e) {
-      console.error("Failed to send push notification", e);
-    }
-  }
 
   revalidatePath("/kudos");
   revalidatePath("/dashboard");

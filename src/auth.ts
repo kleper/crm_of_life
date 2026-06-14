@@ -15,6 +15,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        rememberMe: { label: "Remember Me", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
@@ -40,7 +41,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           isSuperAdmin: user.isSuperAdmin,
-          tenants: user.tenants.map((t) => ({ tenantId: t.tenantId, role: t.role }))
+          tenants: user.tenants.map((t) => ({ tenantId: t.tenantId, role: t.role })),
+          rememberMe: credentials.rememberMe === "true"
         } as any
       },
     }),

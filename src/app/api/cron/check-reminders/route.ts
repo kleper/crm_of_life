@@ -1,14 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import webpush from "web-push";
+import { sendPushToUser } from "@/lib/push";
 
 const prisma = new PrismaClient();
-
-webpush.setVapidDetails(
-  "mailto:admin@crmvida.com",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "",
-  process.env.VAPID_PRIVATE_KEY || ""
-);
 
 export async function GET(req: Request) {
   // En un entorno real, proteger este endpoint con un cron secret
@@ -33,30 +27,12 @@ export async function GET(req: Request) {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays >= contact.followUpFrequencyDays) {
-        // Enviar notificación
-        const subs = await prisma.pushSubscription.findMany({
-          where: { 
-            organizationId: contact.organizationId,
-            userId: contact.createdByUserId
-          }
-        });
-
-        for (const sub of subs) {
-          try {
-            await webpush.sendNotification(
-              {
-                endpoint: sub.endpoint,
-                keys: { p256dh: sub.p256dh, auth: sub.auth }
-              },
-              JSON.stringify({
-                title: "Recordatorio de Contacto",
-                body: `Es hora de contactar a ${contact.name}`,
-                link: `/contacts/${contact.id}`
-              })
-            );
-          } catch (e) {
-            console.error("Push failed for endpoint", sub.endpoint, e);
-          }
+        if (contact.createdByUserId) {
+          await sendPushToUser(contact.createdByUserId, {
+            title: "Recordatorio de Contacto",
+            body: `Es hora de contactar a ${contact.name}`,
+            link: `/contacts/${contact.id}`
+          });
         }
       }
     }
@@ -87,31 +63,12 @@ export async function GET(req: Request) {
       const targetUserId = task.assignedTo || task.createdByUserId;
       if (!targetUserId) continue;
 
-      const subs = await prisma.pushSubscription.findMany({
-        where: { 
-          organizationId: task.tenantId,
-          userId: targetUserId
-        }
+      await sendPushToUser(targetUserId, {
+        title: "Recordatorio de Rutina",
+        body: `Tu tarea recurrente "${task.title}" vence hoy.`,
+        link: `/tasks`,
+        soundType: "default"
       });
-
-      for (const sub of subs) {
-        try {
-          await webpush.sendNotification(
-            {
-              endpoint: sub.endpoint,
-              keys: { p256dh: sub.p256dh, auth: sub.auth }
-            },
-            JSON.stringify({
-              title: "Recordatorio de Rutina",
-              body: `Tu tarea recurrente "${task.title}" vence hoy.`,
-              link: `/tasks`,
-              soundType: "default"
-            })
-          );
-        } catch (e) {
-          console.error("Push failed for endpoint", sub.endpoint, e);
-        }
-      }
 
       await prisma.notification.create({
         data: {

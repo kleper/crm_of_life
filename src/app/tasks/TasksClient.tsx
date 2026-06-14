@@ -44,7 +44,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   
-  const [viewMode, setViewMode] = useState<"BOARD" | "TODAY">("BOARD");
+  const [viewMode, setViewMode] = useState<"BOARD" | "TODAY">("TODAY");
   const [taskFilter, setTaskFilter] = useState<"ALL" | "CREATED" | "ASSIGNED" | "COLLAB">("ALL");
   const [showUpcoming, setShowUpcoming] = useState(false); // Para mostrar tareas recurrentes generadas para mañana/futuro
 
@@ -153,38 +153,36 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
       <div className="w-full max-w-7xl mx-auto flex-1 flex flex-col h-full">
         {/* Header and Gamification */}
         <div className="bg-white border-b border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shrink-0 relative overflow-hidden">
-          <div className="relative z-10 flex flex-col items-start gap-4 lg:w-1/3">
+          <div className="relative z-10 flex flex-row items-center justify-between lg:w-1/3">
             <div>
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">Tareas</h1>
-              <p className="text-sm text-slate-500 font-medium">Organiza tu trabajo y gana puntos.</p>
+              <p className="text-xs text-slate-500 font-medium hidden sm:block">Organiza tu trabajo y gana puntos.</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="primary" onClick={() => setIsSheetOpen(true)} className="uppercase tracking-wider text-xs font-bold px-6 py-3 rounded-none shadow-sm">
-                + Nueva Tarea
-              </Button>
-            </div>
+            <Button variant="primary" onClick={() => setIsSheetOpen(true)} className="uppercase tracking-wider text-xs font-bold px-4 py-2 rounded-none shadow-sm whitespace-nowrap">
+              + Nueva Tarea
+            </Button>
           </div>
 
           {stats && (
-            <div className="relative z-10 flex-1 flex gap-6 items-center lg:justify-end bg-slate-50/50 p-4 border border-slate-100">
-              <div className="text-center">
+            <div className="relative z-10 flex gap-4 md:gap-6 items-center overflow-x-auto pb-2 md:pb-0 scrollbar-hide bg-slate-50/50 p-3 md:p-4 border border-slate-100 min-w-0">
+              <div className="text-center shrink-0">
                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Nivel</div>
-                <div className="text-3xl font-black text-indigo-600 leading-none">{stats.currentLevel}</div>
+                <div className="text-2xl md:text-3xl font-black text-indigo-600 leading-none">{stats.currentLevel}</div>
               </div>
               
-              <div className="w-full max-w-[200px]">
+              <div className="w-[120px] md:w-[200px] shrink-0">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 mb-2">
-                  <span className="text-indigo-600">{stats.totalPoints} pts</span>
-                  <span>Meta: {Math.pow(stats.currentLevel, 2) * 100}</span>
+                  <span className="text-indigo-600 truncate">{stats.totalPoints} pts</span>
+                  <span className="truncate">Meta: {Math.pow(stats.currentLevel, 2) * 100}</span>
                 </div>
-                <div className="h-2 bg-slate-100 w-full border border-slate-200">
+                <div className="h-1.5 md:h-2 bg-slate-100 w-full border border-slate-200">
                   <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${calculateProgress()}%` }}></div>
                 </div>
               </div>
 
-              <div className="text-center border-l border-slate-200 pl-6">
+              <div className="text-center border-l border-slate-200 pl-4 md:pl-6 shrink-0">
                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Racha</div>
-                <div className="text-2xl font-black text-amber-500 flex items-center justify-center gap-1 leading-none">
+                <div className="text-xl md:text-2xl font-black text-amber-500 flex items-center justify-center gap-1 leading-none">
                   🔥 {stats.currentStreak}
                 </div>
               </div>
@@ -193,54 +191,55 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
         </div>
 
         {/* Navigation Bar */}
-        <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex flex-col sm:flex-row gap-4 justify-between shrink-0">
-          <div className="flex gap-1 bg-slate-100 p-1">
+        <div className="bg-white border-b border-slate-200 px-4 py-2 flex flex-row items-center justify-between gap-2 overflow-x-auto shrink-0">
+          <div className="flex gap-1 bg-slate-100 p-1 shrink-0">
             <button 
               onClick={() => setViewMode("BOARD")}
-              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "BOARD" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "BOARD" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
               📋 Tablero
             </button>
             <button 
               onClick={() => setViewMode("TODAY")}
-              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "TODAY" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "TODAY" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
               📅 Hoy
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2 shrink-0">
             {viewMode === "BOARD" && (
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
+              <label className="flex items-center gap-1 text-[10px] sm:text-xs font-bold text-slate-600 cursor-pointer whitespace-nowrap">
                 <input 
                   type="checkbox" 
                   checked={showUpcoming} 
                   onChange={(e) => setShowUpcoming(e.target.checked)}
-                  className="w-4 h-4 accent-indigo-600"
+                  className="w-3 h-3 accent-indigo-600"
                 />
-                Mostrar próximas
+                <span className="hidden sm:inline">Mostrar próximas</span>
+                <span className="sm:hidden">Próximas</span>
               </label>
             )}
 
-            <Select 
-              label=""
-              name="filter"
-              value={taskFilter}
-              onChange={(e) => setTaskFilter(e.target.value as any)}
-              options={[
-                { value: "ALL", label: "Todas mis tareas" },
-                { value: "CREATED", label: "Creadas por mí" },
-                { value: "ASSIGNED", label: "Asignadas a mí" },
-                { value: "COLLAB", label: "Donde colaboro" }
-              ]}
-            />
+            <div className="w-[140px] sm:w-[180px]">
+              <select
+                value={taskFilter}
+                onChange={(e) => setTaskFilter(e.target.value as any)}
+                className="w-full bg-white border border-slate-300 text-xs px-2 py-1.5 outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="ALL">Todas las tareas</option>
+                <option value="CREATED">Creadas por mí</option>
+                <option value="ASSIGNED">Asignadas a mí</option>
+                <option value="COLLAB">Colaboraciones</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-hidden p-4 sm:p-6">
           {viewMode === "BOARD" ? (
-            <div className="flex gap-6 h-full items-stretch overflow-x-auto pb-4">
+            <div className="flex gap-4 h-full items-stretch overflow-x-auto snap-x snap-mandatory pb-4">
               <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
                 <KanbanColumn id="TODO" title="Por Hacer" tasks={filteredTasks.filter(t => t.status === "TODO")} onTaskClick={handleTaskClick} />
                 <KanbanColumn id="IN_PROGRESS" title="En Progreso" tasks={filteredTasks.filter(t => t.status === "IN_PROGRESS")} onTaskClick={handleTaskClick} />

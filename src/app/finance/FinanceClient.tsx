@@ -53,18 +53,18 @@ export default function FinanceClient({ categories, transactions, summary, curre
       />
 
       {/* Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="flex flex-col justify-center text-center p-8">
-          <h2 className="text-sm text-slate-500 uppercase tracking-wider mb-2 font-bold">Total Ingresos</h2>
-          <p className="text-4xl font-black text-emerald-600">{formatCurrency(summary.totalIncome, currency)}</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+        <Card className="flex flex-col justify-center text-center p-4 md:p-8">
+          <h2 className="text-[10px] md:text-sm text-slate-500 uppercase tracking-wider mb-1 md:mb-2 font-bold">Total Ingresos</h2>
+          <p className="text-xl md:text-4xl font-black text-emerald-600">{formatCurrency(summary.totalIncome, currency)}</p>
         </Card>
-        <Card className="flex flex-col justify-center text-center p-8">
-          <h2 className="text-sm text-slate-500 uppercase tracking-wider mb-2 font-bold">Total Gastos</h2>
-          <p className="text-4xl font-black text-red-600">{formatCurrency(summary.totalExpense, currency)}</p>
+        <Card className="flex flex-col justify-center text-center p-4 md:p-8">
+          <h2 className="text-[10px] md:text-sm text-slate-500 uppercase tracking-wider mb-1 md:mb-2 font-bold">Total Gastos</h2>
+          <p className="text-xl md:text-4xl font-black text-red-600">{formatCurrency(summary.totalExpense, currency)}</p>
         </Card>
-        <Card className="flex flex-col justify-center text-center p-8 bg-slate-900 border-slate-900 text-white">
-          <h2 className="text-sm text-slate-400 uppercase tracking-wider mb-2 font-bold">Balance Neto</h2>
-          <p className="text-4xl font-black">{formatCurrency(summary.balance, currency)}</p>
+        <Card className="col-span-2 md:col-span-1 flex flex-col justify-center text-center p-4 md:p-8 bg-slate-900 border-slate-900 text-white">
+          <h2 className="text-xs md:text-sm text-slate-400 uppercase tracking-wider mb-1 md:mb-2 font-bold">Balance Neto</h2>
+          <p className="text-3xl md:text-4xl font-black">{formatCurrency(summary.balance, currency)}</p>
         </Card>
       </div>
 
@@ -74,14 +74,14 @@ export default function FinanceClient({ categories, transactions, summary, curre
           <h2 className="text-xl font-bold mb-6 text-slate-800 border-b border-slate-100 pb-2">Gastos por Categoría</h2>
           <div className="flex flex-col items-center justify-center space-y-4 flex-1">
             {summary.distribution.length > 0 ? (
-               <div className="flex flex-row items-center space-x-8">
+               <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 w-full">
                  <PieChart data={summary.distribution} />
-                 <div className="space-y-3">
+                 <div className="space-y-3 w-full md:w-auto">
                    {summary.distribution.map((d: any, i: number) => (
                      <div key={i} className="flex items-center space-x-3 text-sm">
-                       <span className="w-4 h-4 block rounded-none" style={{ backgroundColor: d.color }}></span>
-                       <span className="font-medium text-slate-700">{d.name}:</span>
-                       <span className="font-bold text-slate-900">{formatCurrency(d.amount, currency)}</span>
+                       <span className="w-4 h-4 block rounded-none shrink-0" style={{ backgroundColor: d.color }}></span>
+                       <span className="font-medium text-slate-700 truncate flex-1">{d.name}:</span>
+                       <span className="font-bold text-slate-900 shrink-0">{formatCurrency(d.amount, currency)}</span>
                      </div>
                    ))}
                  </div>

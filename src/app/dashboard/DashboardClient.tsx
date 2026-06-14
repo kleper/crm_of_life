@@ -91,41 +91,41 @@ export default function DashboardClient({
         />
 
         {/* 1. Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <span className="text-6xl">📅</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+          <Card className="flex flex-col justify-between relative overflow-hidden group p-3 md:p-6">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
             </div>
-            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider relative z-10">Hoy</span>
-            <span className="text-4xl font-black text-indigo-600 mt-2 relative z-10">{productivity.completedToday}</span>
-            <span className="text-xs font-bold text-slate-400 mt-1 relative z-10">tareas completadas</span>
+            <span className="text-[10px] md:text-sm font-bold text-slate-500 uppercase tracking-wider relative z-10">Hoy</span>
+            <span className="text-3xl md:text-4xl font-black text-indigo-600 mt-1 md:mt-2 relative z-10">{productivity.completedToday}</span>
+            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-1 relative z-10 leading-tight">tareas<br className="md:hidden" /> completadas</span>
           </Card>
           
-          <Card className="flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <span className="text-6xl">📈</span>
+          <Card className="flex flex-col justify-between relative overflow-hidden group p-3 md:p-6">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
             </div>
-            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider relative z-10">Semana</span>
-            <span className="text-4xl font-black text-indigo-600 mt-2 relative z-10">{productivity.completedThisWeek}</span>
-            <span className="text-xs font-bold text-slate-400 mt-1 relative z-10">tareas completadas</span>
+            <span className="text-[10px] md:text-sm font-bold text-slate-500 uppercase tracking-wider relative z-10">Semana</span>
+            <span className="text-3xl md:text-4xl font-black text-indigo-600 mt-1 md:mt-2 relative z-10">{productivity.completedThisWeek}</span>
+            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-1 relative z-10 leading-tight">tareas<br className="md:hidden" /> completadas</span>
           </Card>
           
-          <Card variant={productivity.overdue > 0 ? 'alert' : 'default'} className="flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <span className="text-6xl">⚠️</span>
+          <Card variant={productivity.overdue > 0 ? 'alert' : 'default'} className="flex flex-col justify-between relative overflow-hidden group p-3 md:p-6">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
             </div>
-            <span className={`text-sm font-bold uppercase tracking-wider relative z-10 ${productivity.overdue > 0 ? 'text-red-500' : 'text-slate-500'}`}>Vencidas</span>
-            <span className={`text-4xl font-black mt-2 relative z-10 ${productivity.overdue > 0 ? 'text-red-600' : 'text-slate-600'}`}>{productivity.overdue}</span>
-            <span className="text-xs font-bold text-slate-400 mt-1 relative z-10">tareas atrasadas</span>
+            <span className={`text-[10px] md:text-sm font-bold uppercase tracking-wider relative z-10 ${productivity.overdue > 0 ? 'text-red-500' : 'text-slate-500'}`}>Vencidas</span>
+            <span className={`text-3xl md:text-4xl font-black mt-1 md:mt-2 relative z-10 ${productivity.overdue > 0 ? 'text-red-600' : 'text-slate-600'}`}>{productivity.overdue}</span>
+            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-1 relative z-10 leading-tight">tareas<br className="md:hidden" /> atrasadas</span>
           </Card>
           
-          <Card className="flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <span className="text-6xl">🎯</span>
+          <Card className="flex flex-col justify-between relative overflow-hidden group p-3 md:p-6">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             </div>
-            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider relative z-10">Tasa de Éxito</span>
-            <span className="text-4xl font-black text-emerald-500 mt-2 relative z-10">{productivity.completionRate}%</span>
-            <span className="text-xs font-bold text-slate-400 mt-1 relative z-10">completadas vs totales</span>
+            <span className="text-[10px] md:text-sm font-bold text-slate-500 uppercase tracking-wider relative z-10 leading-tight">Tasa de <br className="md:hidden" />Éxito</span>
+            <span className="text-3xl md:text-4xl font-black text-emerald-500 mt-1 md:mt-2 relative z-10">{productivity.completionRate}%</span>
+            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-1 relative z-10 leading-tight">completadas<br className="md:hidden" /> vs totales</span>
           </Card>
         </div>
 

@@ -25,7 +25,7 @@ export default function KanbanColumn({ id, title, tasks, onTaskClick }: KanbanCo
   const baseStyle = columnColors[id] || "border-t-slate-400 bg-slate-50";
 
   return (
-    <div className={`flex flex-col flex-1 min-w-[300px] border border-slate-200 border-t-4 p-4 ${baseStyle} transition-colors ${isOver ? 'ring-2 ring-indigo-300' : ''}`}>
+    <div className={`snap-start shrink-0 flex flex-col w-[85vw] md:w-auto md:flex-1 min-w-[280px] md:min-w-[300px] border border-slate-200 border-t-4 p-4 ${baseStyle} transition-colors ${isOver ? 'ring-2 ring-indigo-300' : ''}`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-sm font-black text-slate-800 uppercase tracking-wider">{title}</h2>
         <span className="text-xs font-bold text-slate-500 bg-white px-2 py-0.5 border border-slate-200">{tasks.length}</span>
