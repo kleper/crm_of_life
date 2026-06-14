@@ -14,6 +14,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { Input, Select } from "@/components/ui/Input";
 import RecurrenceBuilder from "@/components/tasks/RecurrenceBuilder";
 import { createRecurringTaskTemplate } from "@/features/tasks/recurring-actions";
+import Link from "next/link";
 
 interface TasksClientProps {
   initialTasks: any[];
@@ -158,7 +159,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">Tareas</h1>
               <p className="text-xs text-slate-500 font-medium hidden sm:block">Organiza tu trabajo y gana puntos.</p>
             </div>
-            <Button variant="primary" onClick={() => setIsSheetOpen(true)} className="uppercase tracking-wider text-xs font-bold px-4 py-2 rounded-none shadow-sm whitespace-nowrap">
+            <Button variant="primary" onClick={() => setIsSheetOpen(true)} className="hidden md:block uppercase tracking-wider text-xs font-bold px-4 py-2 rounded-none shadow-sm whitespace-nowrap">
               + Nueva Tarea
             </Button>
           </div>
@@ -205,6 +206,13 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
             >
               📅 Hoy
             </button>
+            <Link 
+              href="/tasks/recurring"
+              className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors text-slate-500 hover:text-slate-700 flex items-center gap-1"
+              title="Rutinas / Tareas Recurrentes"
+            >
+              🔁 <span className="hidden sm:inline">Rutinas</span>
+            </Link>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -331,6 +339,22 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           onUpdated={() => window.location.reload()}
         />
       )}
+
+      {/* FAB Mobile for + Nueva Tarea */}
+      <div 
+        className="fixed md:hidden z-50" 
+        style={{ bottom: 'calc(64px + env(safe-area-inset-bottom) + 16px)', right: '16px' }}
+      >
+        <button 
+          onClick={() => setIsSheetOpen(true)}
+          className="w-14 h-14 rounded-none shadow-lg flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+          aria-label="Nueva Tarea"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </div>
 
       {/* New Task Sheet */}
       <Sheet isOpen={isSheetOpen} onClose={() => {
