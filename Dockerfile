@@ -37,6 +37,13 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy Prisma schema and seed files for database migration and seeding
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
+
+# Fix npm cache permissions for npx commands in production (e.g. npx prisma migrate)
+ENV npm_config_cache=/tmp
+
 USER nextjs
 
 EXPOSE 3000
