@@ -123,7 +123,7 @@ Una vez que los contenedores estén corriendo, debes inyectar la estructura de l
 
 ```bash
 # Sincronizar el esquema de Prisma con la base de datos
-sudo docker exec -it crm_of_life-app-1 sh -c "npx --yes prisma@6.19.3 migrate deploy"
+sudo docker exec -it crm_of_life-app-1 sh -c "node node_modules/prisma/build/index.js migrate deploy"
 
 # Ejecutar el Seed inicial (Crea el super administrador usando el .env)
 sudo docker exec -it crm_of_life-app-1 sh -c "npx --yes tsx prisma/seed.ts"
