@@ -62,7 +62,6 @@ export async function GET(request: Request) {
             } catch (e) {
               console.error("Push failed for user", targetUserId, e);
             }
-          }
             
             await prisma.notification.create({
               data: {
