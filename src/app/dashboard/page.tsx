@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { PrismaClient } from "@prisma/client"
 import DashboardClient from "./DashboardClient"
 import {
   getProductivitySummary,
@@ -32,6 +33,13 @@ export default async function DashboardPage() {
 
   const currentTenantId = (session.user as any).selectedTenantId;
   const userId = session.user.id as string;
+
+  // Prevención de "Ghost Sessions" (cuando se hace un reset de la BD pero el navegador retiene el JWT)
+  const prisma = new PrismaClient();
+  const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+  if (!dbUser) {
+    redirect("/api/auth/signout");
+  }
 
   const [
     productivity,
