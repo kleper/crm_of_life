@@ -48,7 +48,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
   
   const [viewMode, setViewMode] = useState<"BOARD" | "TODAY">("TODAY");
   const [taskFilter, setTaskFilter] = useState<"ALL" | "CREATED" | "ASSIGNED" | "COLLAB">("ALL");
-  const [showUpcoming, setShowUpcoming] = useState(false); // Para mostrar tareas recurrentes generadas para mañana/futuro
+  const [hideCompleted, setHideCompleted] = useState(true);
 
   // New Task State
   const [activeTab, setActiveTab] = useState<"DETALLES" | "RUTINA">("DETALLES");
@@ -77,20 +77,60 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
     return dStr > todayStr;
   };
 
-  const filteredTasks = optimisticTasks.filter(t => {
+  // --- Filter by user role ---
+  const userFilteredTasks = optimisticTasks.filter(t => {
     if (taskFilter === "CREATED" && t.createdByUserId !== currentUserId) return false;
     if (taskFilter === "ASSIGNED" && t.assignedTo !== currentUserId) return false;
     if (taskFilter === "COLLAB" && !t.collaborators?.some((c: any) => c.userId === currentUserId)) return false;
-
-    if (!showUpcoming && viewMode === "BOARD") {
-      // Hide upcoming tasks if not explicitly checked
-      if (t.dueDate && isUpcoming(new Date(t.dueDate))) {
-        return false;
-      }
-    }
-    
     return true;
   });
+
+  // --- Board: show ALL pending tasks, but collapse recurring duplicates ---
+  // For recurring tasks (same recurringTemplateId), keep only the nearest 
+  // pending instance so the board doesn't fill with 30 copies of "Meditar".
+  const deduplicateRecurring = (tasks: any[]) => {
+    const nonRecurring: any[] = [];
+    const byTemplate = new Map<string, any[]>();
+
+    for (const t of tasks) {
+      if (t.recurringTemplateId) {
+        const existing = byTemplate.get(t.recurringTemplateId) || [];
+        existing.push(t);
+        byTemplate.set(t.recurringTemplateId, existing);
+      } else {
+        nonRecurring.push(t);
+      }
+    }
+
+    // For each template, pick the nearest pending (by dueDate asc), or
+    // if all are done, include them all so "Completadas" column shows them.
+    const collapsedRecurring: any[] = [];
+    byTemplate.forEach((instances) => {
+      const pending = instances.filter(t => t.status !== "DONE");
+      if (pending.length > 0) {
+        // Sort by dueDate asc, nulls last
+        pending.sort((a, b) => {
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        });
+        // Keep the nearest one but annotate how many more are pending
+        const representative = { ...pending[0], _recurringCount: pending.length };
+        collapsedRecurring.push(representative);
+      }
+      // Always include completed instances (for the DONE column)
+      const done = instances.filter(t => t.status === "DONE");
+      collapsedRecurring.push(...done);
+    });
+
+    return [...nonRecurring, ...collapsedRecurring];
+  };
+
+  const filteredTasks = viewMode === "BOARD" 
+    ? deduplicateRecurring(hideCompleted 
+        ? userFilteredTasks.filter(t => t.status !== "DONE") 
+        : userFilteredTasks)
+    : userFilteredTasks;
 
   const todayTasks = filteredTasks.filter(t => t.dueDate && isToday(new Date(t.dueDate)) && t.status !== "DONE");
   const overdueTasks = filteredTasks.filter(t => t.dueDate && isOverdue(new Date(t.dueDate)) && t.status !== "DONE");
@@ -230,12 +270,12 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               <label className="flex items-center gap-1 text-[10px] sm:text-xs font-bold text-slate-600 cursor-pointer whitespace-nowrap">
                 <input 
                   type="checkbox" 
-                  checked={showUpcoming} 
-                  onChange={(e) => setShowUpcoming(e.target.checked)}
+                  checked={hideCompleted} 
+                  onChange={(e) => setHideCompleted(e.target.checked)}
                   className="w-3 h-3 accent-indigo-600"
                 />
-                <span className="hidden sm:inline">Mostrar próximas</span>
-                <span className="sm:hidden">Próximas</span>
+                <span className="hidden sm:inline">Ocultar completadas</span>
+                <span className="sm:hidden">Ocultar ✓</span>
               </label>
             )}
 

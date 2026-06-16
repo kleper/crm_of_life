@@ -43,15 +43,22 @@ export default function TaskCard({ task, onClick }: { task: any, onClick?: () =>
         className={`p-4 cursor-pointer active:cursor-grabbing hover:border-indigo-400 transition-colors bg-white ${task.status === "DONE" ? "opacity-60" : ""} ${task._isOptimistic ? "opacity-50" : ""}`}
       >
         <div className="flex justify-between items-start mb-2">
-          <h3 className={`font-bold text-sm flex gap-1 items-center ${task.status === "DONE" ? 'line-through text-slate-500' : 'text-slate-900'}`}>
+          <h3 className={`font-bold text-sm flex gap-1 items-center min-w-0 ${task.status === "DONE" ? 'line-through text-slate-500' : 'text-slate-900'}`}>
             {task.recurringTemplateId && (
               <span className="text-[12px] opacity-70" title="Parte de una serie recurrente">🔁</span>
             )}
-            {task.title}
+            <span className="truncate">{task.title}</span>
           </h3>
-          <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-200 shrink-0 ml-2">
-            +{task.points}
-          </span>
+          <div className="flex items-center gap-1 shrink-0 ml-2">
+            {task._recurringCount > 1 && (
+              <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 border border-indigo-200 whitespace-nowrap" title={`${task._recurringCount} instancias pendientes`}>
+                🔁 x{task._recurringCount}
+              </span>
+            )}
+            <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-200 shrink-0">
+              +{task.points}
+            </span>
+          </div>
         </div>
         
         {task.description && (
