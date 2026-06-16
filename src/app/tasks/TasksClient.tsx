@@ -522,7 +522,11 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           </div>
 
           <div className="flex-1 overflow-y-auto pr-2 pb-24">
-            {activeTab === "DETALLES" && (
+            {/* CRITICAL: Use hidden instead of conditional rendering so that
+                form inputs (title, description, etc.) are always in the DOM.
+                Otherwise formData.get("title") returns null when submitting
+                from the Rutina tab. */}
+            <div className={activeTab !== "DETALLES" ? "hidden" : ""}>
               <div className="flex flex-col gap-5">
                 <Input label="Título" type="text" name="title" required placeholder="Ej: Comprar leche" />
                 
@@ -552,9 +556,9 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   {isRecurring && <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2 border border-amber-200">La fecha base se maneja desde la pestaña Recurrencia.</p>}
                 </div>
               </div>
-            )}
+            </div>
 
-            {activeTab === "RUTINA" && (
+            <div className={activeTab !== "RUTINA" ? "hidden" : ""}>
               <div className="flex flex-col gap-6">
                 <label className="flex items-center gap-3 p-4 border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
                   <input 
@@ -618,7 +622,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
           
           <div className="absolute bottom-0 left-0 w-full bg-slate-50 border-t border-slate-200 p-4 sm:p-6 flex justify-end gap-3 z-20">

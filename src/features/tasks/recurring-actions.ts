@@ -59,6 +59,75 @@ export async function createRecurringTaskTemplate(data: {
   return template;
 }
 
+/**
+ * Converts an existing one-off task into a recurring template.
+ * - Creates a RecurringTaskTemplate using the task's current data.
+ * - Links the original task as the first generated instance.
+ * - Triggers the cron to generate future instances.
+ */
+export async function convertTaskToRecurring(taskId: string, rrule: string) {
+  const session = await auth();
+  const user = session?.user as any;
+  if (!user?.selectedTenantId) throw new Error("Unauthorized");
+
+  // Fetch the task and verify tenant ownership
+  const task = await prisma.task.findUnique({
+    where: { id: taskId },
+    include: { subtasks: { orderBy: { order: "asc" } } }
+  });
+
+  if (!task || task.tenantId !== user.selectedTenantId) {
+    throw new Error("Task not found or unauthorized");
+  }
+
+  if (task.recurringTemplateId) {
+    throw new Error("Task is already part of a recurring series");
+  }
+
+  // Create the recurring template from the task's data
+  const template = await prisma.recurringTaskTemplate.create({
+    data: {
+      organizationId: task.tenantId,
+      createdByUserId: task.createdByUserId || user.id!,
+      title: task.title,
+      description: task.description,
+      categoryId: task.categoryId,
+      points: task.points,
+      assignedToUserId: task.assignedTo,
+      rrule,
+      startDate: new Date(),
+      dueTime: task.dueTime,
+      subtaskTemplates: {
+        create: task.subtasks.map((st, idx) => ({
+          title: st.title,
+          order: st.order ?? idx
+        }))
+      }
+    }
+  });
+
+  // Link the original task as the first generated instance
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      recurringTemplateId: template.id,
+      recurrenceOccurrenceDate: task.dueDate || new Date(),
+      isRecurring: true
+    }
+  });
+
+  // Trigger cron to generate future instances
+  await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cron/generate-recurring-tasks`, {
+    headers: {
+      "Authorization": `Bearer ${process.env.CRON_SECRET}`
+    }
+  }).catch(console.error);
+
+  revalidatePath("/tasks");
+  revalidatePath("/tasks/recurring");
+  return template;
+}
+
 export async function updateRecurringTaskTemplate(id: string, data: any) {
   const session = await auth();
   const user = session?.user as any;

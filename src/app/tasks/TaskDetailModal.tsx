@@ -6,6 +6,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
 import { updateTask, addSubtask, toggleSubtask, deleteSubtask, deleteTask, updateSubtaskDueDate, assignTaskCollaborators, assignSubtask } from "@/features/tasks/actions";
+import { convertTaskToRecurring } from "@/features/tasks/recurring-actions";
 import { getTaskCollaborationSummary } from "@/features/tasks/queries";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { calculateTaskProgress } from "@/lib/subtasks";
@@ -13,6 +14,7 @@ import { TaskStatus } from "@prisma/client";
 import { toast } from "@/lib/toast";
 import { Toast } from "@/components/ui/Toast";
 import SendKudoModal from "@/components/kudos/SendKudoModal";
+import RecurrenceBuilder from "@/components/tasks/RecurrenceBuilder";
 
 function Avatar({ name, image, size = "md" }: { name: string, image?: string | null, size?: "sm" | "md" }) {
   const initial = name ? name.charAt(0).toUpperCase() : "?";
@@ -31,6 +33,8 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
   const [collabSummary, setCollabSummary] = useState<any[]>([]);
   const [showKudoToast, setShowKudoToast] = useState(false);
   const [isKudoModalOpen, setIsKudoModalOpen] = useState(false);
+  const [showRecurrencePanel, setShowRecurrencePanel] = useState(false);
+  const [convertRRule, setConvertRRule] = useState("");
 
   const [selectedCollabIds, setSelectedCollabIds] = useState<string[]>(
     task?.collaborators?.map((c: any) => c.userId) || []
@@ -40,10 +44,31 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
     if (task?.id && isOpen) {
       setSelectedCollabIds(task?.collaborators?.map((c: any) => c.userId) || []);
       getTaskCollaborationSummary(task.id).then(setCollabSummary).catch(console.error);
+      // Reset recurrence panel when opening a different task
+      setShowRecurrencePanel(false);
+      setConvertRRule("");
     }
   }, [task, isOpen]);
 
   if (!task) return null;
+
+  const handleConvertToRecurring = () => {
+    if (!convertRRule) {
+      toast.error("Configura la frecuencia de repetición primero");
+      return;
+    }
+    startTransition(async () => {
+      try {
+        await convertTaskToRecurring(task.id, convertRRule);
+        toast.success("✓ Tarea convertida en rutina recurrente");
+        setShowRecurrencePanel(false);
+        if (onUpdated) onUpdated();
+        onClose();
+      } catch (error: any) {
+        toast.error(error.message || "Error al convertir la tarea");
+      }
+    });
+  };
 
   const subtasks = task.subtasks || [];
   const completedSubtasks = subtasks.filter((s: any) => s.completed).length;
@@ -407,6 +432,66 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Convert to Recurring — only for tasks that are NOT already recurring */}
+        {!task.recurringTemplateId && (
+          <>
+            <hr className="border-slate-200" />
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Repetición</h3>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="text-xs"
+                  onClick={() => setShowRecurrencePanel(!showRecurrencePanel)}
+                >
+                  {showRecurrencePanel ? "Cancelar" : "🔁 Hacer Recurrente"}
+                </Button>
+              </div>
+
+              {showRecurrencePanel && (
+                <div className="border border-indigo-200 bg-indigo-50/30 p-4 space-y-4">
+                  <p className="text-xs text-slate-600">
+                    Configura la frecuencia y esta tarea se convertirá en una rutina. Se generarán nuevas instancias automáticamente según la regla que definas.
+                  </p>
+                  <RecurrenceBuilder 
+                    startDate={new Date()} 
+                    onRRuleChange={setConvertRRule} 
+                  />
+                  <div className="flex justify-end pt-2">
+                    <Button 
+                      type="button" 
+                      variant="primary" 
+                      onClick={handleConvertToRecurring} 
+                      disabled={isPending || !convertRRule}
+                    >
+                      {isPending ? "Convirtiendo..." : "Convertir en Rutina"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {!showRecurrencePanel && (
+                <p className="text-xs text-slate-400 italic">Esta tarea es única. Puedes convertirla en una rutina recurrente.</p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Show recurring info if already recurring */}
+        {task.recurringTemplateId && (
+          <>
+            <hr className="border-slate-200" />
+            <div className="flex items-center gap-2 p-3 bg-indigo-50 border border-indigo-200">
+              <span className="text-lg">🔁</span>
+              <div>
+                <p className="text-sm font-bold text-indigo-800">Tarea Recurrente</p>
+                <p className="text-xs text-indigo-600">Esta tarea es parte de una serie recurrente. Gestiona la rutina desde el panel de Rutinas.</p>
               </div>
             </div>
           </>
