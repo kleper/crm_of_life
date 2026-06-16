@@ -240,7 +240,7 @@ export default function DashboardClient({
 
           {/* 4. Category Distribution */}
           <Card className="flex flex-col !p-4 md:!p-6">
-            <h2 className="text-base md:text-lg font-bold text-slate-800 mb-4 md:mb-6 border-b border-slate-100 pb-2">Categorías (Últimos 30 días)</h2>
+            <h2 className="text-base md:text-lg font-bold text-slate-800 mb-4 md:mb-6 border-b border-slate-100 pb-2">Distribución por Categorías</h2>
             <div className="space-y-3 md:space-y-4 flex-1 overflow-y-auto pr-1 relative">
               {categoryChart.length === 0 ? (
                 <div className="flex items-center justify-center py-8">

@@ -114,6 +114,9 @@ export async function getCategoryDistribution(userId: string, organizationId: st
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
+  // Show ALL tasks with categories (not just completed ones) so the panel
+  // isn't empty when the user has active tasks. Uses createdAt OR completedAt
+  // within the last 30 days to capture both active and recently finished work.
   const tasks = await prisma.task.findMany({
     where: {
       tenantId: organizationId,
@@ -121,10 +124,18 @@ export async function getCategoryDistribution(userId: string, organizationId: st
         { assignedTo: userId },
         { createdByUserId: userId }
       ],
-      status: "DONE",
-      completedAt: {
-        gte: thirtyDaysAgo
-      }
+      categoryId: { not: null },
+      // Include tasks created in last 30 days OR completed in last 30 days
+      // OR still pending (not done) regardless of creation date
+      AND: [
+        {
+          OR: [
+            { status: { not: "DONE" } },
+            { completedAt: { gte: thirtyDaysAgo } },
+            { createdAt: { gte: thirtyDaysAgo } }
+          ]
+        }
+      ]
     },
     include: {
       category: true
