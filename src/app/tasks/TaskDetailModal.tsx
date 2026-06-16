@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
@@ -9,6 +10,7 @@ import { getTaskCollaborationSummary } from "@/features/tasks/queries";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { calculateTaskProgress } from "@/lib/subtasks";
 import { TaskStatus } from "@prisma/client";
+import { toast } from "@/lib/toast";
 import { Toast } from "@/components/ui/Toast";
 import SendKudoModal from "@/components/kudos/SendKudoModal";
 
@@ -49,28 +51,36 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
 
   const taskCollaborators = tenantUsers.filter((tu: any) => selectedCollabIds.includes(tu.user.id));
 
-  const handleUpdate = (formData: FormData) => {
-    startTransition(async () => {
-      const data = {
-        title: formData.get("title") as string,
-        description: formData.get("description") as string,
-        categoryId: formData.get("categoryId") as string,
-        points: parseInt(formData.get("points") as string || "10", 10),
-        dueDate: formData.get("dueDate") as string,
-        status: formData.get("status") as TaskStatus,
-      };
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description || "");
 
-      await updateTask(task.id, data);
-      if (onUpdated) onUpdated();
-      onClose();
-    });
+  const handleUpdateField = async (field: string, value: any) => {
+    const data = {
+      title: task.title,
+      description: task.description,
+      categoryId: task.categoryId,
+      points: task.points,
+      dueDate: task.dueDate,
+      status: task.status,
+      [field]: value
+    };
+    await updateTask(task.id, data);
+    toast.success("✓ Guardado");
+    if (onUpdated) onUpdated();
   };
+
+  const debouncedUpdateText = useDebouncedCallback(async (field: string, value: string) => {
+    startTransition(async () => {
+      await handleUpdateField(field, value);
+    });
+  }, 500);
 
   const handleAddSubtask = () => {
     if (!newSubtaskTitle.trim()) return;
     startTransition(async () => {
       await addSubtask(task.id, newSubtaskTitle);
       setNewSubtaskTitle("");
+      toast.success("Microtarea agregada");
       if (onUpdated) onUpdated();
     });
   };
@@ -86,6 +96,8 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
       // Mostrar Toast si acaba de completarla y hay otros colaboradores
       if (!wasCompleted && taskCollaborators.length > 1) {
         setShowKudoToast(true);
+      } else if (!wasCompleted) {
+        toast.success("Microtarea completada");
       }
     });
   };
@@ -93,6 +105,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
   const handleDeleteSubtask = (subtaskId: string) => {
     startTransition(async () => {
       await deleteSubtask(subtaskId);
+      toast.success("Microtarea eliminada");
       if (onUpdated) onUpdated();
     });
   };
@@ -101,6 +114,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
     if (confirm("¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.")) {
       startTransition(async () => {
         await deleteTask(task.id);
+        toast.success("Tarea eliminada");
         if (onUpdated) onUpdated();
         onClose();
       });
@@ -128,18 +142,32 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
   return (
     <>
       <Sheet isOpen={isOpen} onClose={onClose} title="Detalle de Tarea">
-        <form action={handleUpdate} className="flex flex-col h-full">
+        <div className="flex flex-col h-full">
         
         <div className="flex-1 overflow-y-auto pr-2 pb-24 space-y-6">
         
         {/* Basic Info */}
         <div className="space-y-4">
-          <Input label="Título" type="text" name="title" defaultValue={task.title} required />
+          <Input 
+            label="Título" 
+            type="text" 
+            name="title" 
+            value={title} 
+            onChange={(e) => {
+              setTitle(e.target.value);
+              debouncedUpdateText("title", e.target.value);
+            }} 
+            required 
+          />
           <div className="w-full flex flex-col gap-1">
             <label className="text-sm font-medium text-slate-700">Descripción</label>
             <textarea 
               name="description" 
-              defaultValue={task.description || ""}
+              value={description}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                debouncedUpdateText("description", e.target.value);
+              }}
               className="w-full border border-slate-300 p-2 focus:ring-2 focus:ring-blue-500 outline-none min-h-[80px]"
             ></textarea>
           </div>
@@ -201,6 +229,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
               label="Estado" 
               name="status" 
               defaultValue={task.status}
+              onChange={(e) => startTransition(() => handleUpdateField("status", e.target.value))}
               options={[
                 { value: "TODO", label: "Por Hacer" },
                 { value: "IN_PROGRESS", label: "En Progreso" },
@@ -215,14 +244,34 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
             label="Categoría" 
             name="categoryId" 
             defaultValue={task.categoryId || ""}
+            onChange={(e) => startTransition(() => handleUpdateField("categoryId", e.target.value))}
             options={[
               { value: "", label: "Sin Categoría" },
               ...categories.map((c: any) => ({ value: c.id, label: c.name }))
             ]} 
           />
-          <Input label="Puntos" type="number" name="points" defaultValue={task.points} min={1} max={100} required />
-          <Input label="Fecha Límite" type="date" name="dueDate" defaultValue={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ""} />
-          <Input label="Hora Límite" type="time" name="dueTime" defaultValue={task.dueTime || ""} />
+          <Input 
+            label="Puntos" 
+            type="number" 
+            name="points" 
+            defaultValue={task.points} 
+            onChange={(e) => debouncedUpdateText("points", e.target.value)}
+            min={1} max={100} required 
+          />
+          <Input 
+            label="Fecha Límite" 
+            type="date" 
+            name="dueDate" 
+            defaultValue={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ""}
+            onChange={(e) => startTransition(() => handleUpdateField("dueDate", e.target.value))}
+          />
+          <Input 
+            label="Hora Límite" 
+            type="time" 
+            name="dueTime" 
+            defaultValue={task.dueTime || ""}
+            onChange={(e) => startTransition(() => handleUpdateField("dueTime", e.target.value))}
+          />
         </div>
 
         <hr className="border-slate-200" />
@@ -372,12 +421,12 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
             Eliminar
           </Button>
           <div className="flex gap-3">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={isPending}>Cancelar</Button>
-            <Button type="submit" variant="primary" disabled={isPending}>Guardar</Button>
+            <span className="text-xs text-slate-400 flex items-center">{isPending ? "● Guardando..." : "✓ Al día"}</span>
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isPending}>Cerrar</Button>
           </div>
         </div>
 
-        </form>
+        </div>
       </Sheet>
 
     {showKudoToast && (

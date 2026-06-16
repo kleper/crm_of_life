@@ -69,7 +69,7 @@ export default function KudosClient({ receivedKudos, sentKudos, summary, publicW
   const options = getKudoOptions();
 
   return (
-    <div className="flex flex-col gap-6 h-full">
+    <div className="flex flex-col gap-6">
       {/* Medallero */}
       <div className="bg-white border border-slate-200 p-4 md:p-5 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
@@ -126,7 +126,7 @@ export default function KudosClient({ receivedKudos, sentKudos, summary, publicW
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto pb-8">
+      <div className="pb-8">
         <div className="flex flex-col gap-4 max-w-3xl">
           {tab === "wall" && publicWall.length === 0 && (
             <div className="text-center p-10 border border-dashed border-slate-300 text-slate-500">

@@ -5,6 +5,7 @@ import { ConnectionStatusBanner } from "../ConnectionStatusBanner";
 import { getUnreadNotificationsCount } from "@/features/notifications/actions";
 import NotificationSoundListener from "./NotificationSoundListener";
 import { PushSubscriptionGuardian } from "../PushSubscriptionGuardian";
+import { ToastContainer } from "../ui/ToastContainer";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const unreadCount = await getUnreadNotificationsCount();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex min-h-[100dvh] bg-slate-50 relative">
       <NavigationClient 
         canManage={canManage} 
         userName={userName} 
@@ -53,10 +54,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         unreadCount={unreadCount}
       />
       
-      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-16 md:pb-0 flex flex-col relative">
+      <main className="flex-1 pb-16 md:pb-0 flex flex-col relative w-full overflow-x-hidden">
         <ConnectionStatusBanner />
         <NotificationSoundListener soundsEnabled={soundsEnabled} />
         <PushSubscriptionGuardian />
+        <ToastContainer />
         {children}
       </main>
     </div>

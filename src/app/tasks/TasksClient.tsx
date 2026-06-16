@@ -6,6 +6,7 @@ import { TaskStatus } from "@prisma/client";
 import { updateTaskStatus, createTask, GamificationResult } from "@/features/tasks/actions";
 import { addPendingMutation } from "@/lib/idb";
 import { subscribeToPushNotifications } from "@/lib/pushClient";
+import { toast } from "@/lib/toast";
 import KanbanColumn from "./KanbanColumn";
 import AchievementToast, { Achievement } from "./AchievementToast";
 import TaskDetailModal from "./TaskDetailModal";
@@ -94,6 +95,12 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
   const todayTasks = filteredTasks.filter(t => t.dueDate && isToday(new Date(t.dueDate)) && t.status !== "DONE");
   const overdueTasks = filteredTasks.filter(t => t.dueDate && isOverdue(new Date(t.dueDate)) && t.status !== "DONE");
 
+  const upcomingSubtasks = optimisticTasks.flatMap(task => 
+    (task.subtasks || [])
+      .filter((st: any) => !st.completed && st.dueDate && (isToday(new Date(st.dueDate)) || isOverdue(new Date(st.dueDate))))
+      .map((st: any) => ({ subtask: st, parentTask: task }))
+  );
+
   const handleTaskClick = (task: any) => {
     setSelectedTask(task);
   };
@@ -130,10 +137,13 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
 
           if (result.unlockedAchievements.length > 0) {
             setCurrentAchievement(result.unlockedAchievements[0]);
+          } else if (newStatus === "DONE") {
+            toast.info(`✓ +${result.pointsEarned} pts ganados 🎉`);
           }
         }
       } catch (error) {
         console.error("Failed to update status", error);
+        toast.error("Error al actualizar la tarea");
       }
     });
   };
@@ -204,7 +214,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               onClick={() => setViewMode("TODAY")}
               className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "TODAY" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
-              📅 Hoy
+              📅 Agenda
             </button>
             <Link 
               href="/tasks/recurring"
@@ -259,29 +269,36 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               {/* Overdue Section */}
               {overdueTasks.length > 0 && (
                 <section>
-                  <h3 className="text-sm font-black text-red-600 uppercase tracking-wider mb-4 border-b border-red-200 pb-2">Vencidas</h3>
+                  <h3 className="text-sm font-black text-amber-700 uppercase tracking-wider mb-4 border-b border-amber-200 pb-2 flex items-center gap-2 bg-amber-50 p-2">
+                    ⚠ Pendientes ({overdueTasks.length})
+                  </h3>
                   <div className="space-y-3">
-                    {overdueTasks.map(task => (
-                      <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-red-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
+                    {overdueTasks.slice(0, 5).map(task => (
+                      <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-amber-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
                         <div className="flex items-center gap-3">
                           <button 
-                            className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-indigo-500 transition-colors"
+                            className="w-8 h-8 rounded-full border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
                             }}
                           />
                           <div>
-                            <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{task.title}</h4>
-                            <div className="flex gap-2 text-xs text-slate-500 mt-1 font-medium">
-                              <span className="text-red-500">{new Date(task.dueDate).toLocaleDateString()}</span>
+                            <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{task.title}</h4>
+                            <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
+                              <span className="text-amber-600">{new Date(task.dueDate).toLocaleDateString()}</span>
                               {task.dueTime && <span>• {task.dueTime}</span>}
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">+{task.points}</span>
+                        <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>
                       </div>
                     ))}
+                    {overdueTasks.length > 5 && (
+                      <div className="text-center py-2">
+                        <span className="text-xs font-bold text-slate-500 italic">+ {overdueTasks.length - 5} tareas pendientes más</span>
+                      </div>
+                    )}
                   </div>
                 </section>
               )}
@@ -289,12 +306,14 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               {/* Today Section */}
               <section>
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
-                  <span>Para Hoy</span>
+                  <span>Hoy — {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
                   <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5">{todayTasks.length}</span>
                 </h3>
                 {todayTasks.length === 0 ? (
                   <div className="text-center py-12 bg-white border border-dashed border-slate-300">
-                    <p className="text-slate-500 font-medium">No tienes tareas pendientes para hoy. ¡Disfruta tu día! 🎉</p>
+                    <p className="text-slate-500 font-medium">
+                      {overdueTasks.length === 0 ? "¡Todo al día por hoy! 🎉" : "No hay nuevas tareas para hoy"}
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -302,26 +321,47 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                       <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-indigo-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
                         <div className="flex items-center gap-3">
                           <button 
-                            className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-indigo-500 transition-colors"
+                            className="w-8 h-8 rounded-full border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
                             }}
                           />
                           <div>
-                            <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{task.title}</h4>
-                            <div className="flex gap-2 text-xs text-slate-500 mt-1 font-medium">
+                            <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{task.title}</h4>
+                            <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
                               {task.dueTime ? <span>🕒 {task.dueTime}</span> : <span>Todo el día</span>}
                               {task.categoryId && <span>• {categories.find((c:any) => c.id === task.categoryId)?.name}</span>}
+                              {task.recurrenceRule && <span>• 🔁</span>}
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">+{task.points}</span>
+                        <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>
                       </div>
                     ))}
                   </div>
                 )}
               </section>
+
+              {/* Upcoming Subtasks Section */}
+              {upcomingSubtasks.length > 0 && (
+                <section>
+                  <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
+                    Microtareas pendientes ({upcomingSubtasks.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {upcomingSubtasks.map(({subtask, parentTask}) => (
+                      <div key={subtask.id} onClick={() => handleTaskClick(parentTask)} className="bg-slate-50 border border-slate-200 p-3 cursor-pointer hover:bg-slate-100 transition-colors flex items-center gap-3 group">
+                        <span className="text-indigo-400">📌</span>
+                        <div>
+                          <h4 className="font-medium text-sm text-slate-800 line-clamp-1">{subtask.title}</h4>
+                          <span className="text-[10px] text-slate-500">De: {parentTask.title}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
           )}
         </div>
@@ -336,7 +376,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           isOpen={!!selectedTask} 
           currentUserId={currentUserId}
           onClose={() => setSelectedTask(null)}
-          onUpdated={() => window.location.reload()}
+          onUpdated={() => {}}
         />
       )}
 
@@ -376,10 +416,12 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                 dueTime: formData.get("dueTime") as string || undefined,
                 subtasks: subtasks
               });
-              setIsSheetOpen(false);
+              toast.success("Rutina creada exitosamente");
+              // Limpiamos los campos pero mantenemos abierto el modal
               setIsRecurring(false);
               setSubtasks([]);
               setRruleStr("");
+              // Reseteamos form (opcional, dejamos que el form siga abierto)
             });
             return;
           }
@@ -413,13 +455,13 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
             // Online creation
             startTransition(async () => {
               await createTask(formData);
+              toast.success("Tarea creada exitosamente");
               if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
                 const res = confirm("¿Deseas activar las notificaciones push para recordatorios de tareas?");
                 if (res) await subscribeToPushNotifications();
               }
             });
           }
-          setIsSheetOpen(false);
         }} className="flex flex-col h-full">
           
           <div className="flex border-b border-slate-200 mb-6 bg-slate-50 p-1">

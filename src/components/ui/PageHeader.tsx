@@ -7,11 +7,12 @@ interface PageHeaderProps {
   actionLabel?: string;
   onAction?: () => void;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export function PageHeader({ title, description, actionLabel, onAction, children }: PageHeaderProps) {
+export function PageHeader({ title, description, actionLabel, onAction, children, className }: PageHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${className || "mb-8"}`}>
       <div>
         <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
         {description && <p className="text-slate-600 mt-2">{description}</p>}

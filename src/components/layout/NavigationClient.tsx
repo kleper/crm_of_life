@@ -112,7 +112,7 @@ export default function NavigationClient({ canManage, userName, userTenants, act
       </nav>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col h-full z-10 relative">
+      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col h-[100dvh] sticky top-0 z-10 shrink-0">
         <div className="h-16 flex items-center px-4 border-b border-slate-200 justify-between">
           <Link href="/dashboard" className="font-black text-xl text-indigo-700 tracking-tighter">
             CRM VIDA
