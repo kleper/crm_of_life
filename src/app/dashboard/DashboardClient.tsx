@@ -81,8 +81,8 @@ export default function DashboardClient({
   const strokeDashoffset = circumference - (gamification.progressPct / 100) * circumference;
 
   return (
-    <div className="flex flex-col flex-1 p-6 h-full">
-      <div className="w-full max-w-7xl mx-auto space-y-8">
+    <div className="flex flex-col flex-1 p-4 md:p-6 h-full">
+      <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8">
         
         {/* Header Title */}
         <PageHeader 
@@ -131,7 +131,7 @@ export default function DashboardClient({
         </div>
 
         {/* 2. Gamification Widget */}
-        <Card className="flex flex-col md:flex-row items-center gap-8 bg-indigo-900 text-white border-indigo-800">
+        <Card className="flex flex-col md:flex-row items-center gap-6 md:gap-8 bg-indigo-900 text-white border-indigo-800 min-w-0 p-4 md:p-6 overflow-hidden">
           
           {/* Level Ring */}
           <div className="relative flex items-center justify-center">
@@ -156,14 +156,14 @@ export default function DashboardClient({
             </div>
           </div>
           
-          <div className="flex-1 w-full text-center md:text-left">
+          <div className="flex-1 w-full text-center md:text-left min-w-0">
             <div className="text-2xl font-black mb-1">{gamification.totalPoints} <span className="text-indigo-300 font-medium text-lg">pts acumulados</span></div>
             <div className="text-sm text-indigo-200">
               Faltan <strong className="text-emerald-400">{gamification.pointsMissing} pts</strong> para alcanzar el Nivel {gamification.currentLevel + 1}.
             </div>
           </div>
 
-          <div className="flex gap-6 border-t md:border-t-0 md:border-l border-indigo-800/50 pt-6 md:pt-0 md:pl-8">
+          <div className="flex gap-4 md:gap-6 border-t md:border-t-0 md:border-l border-indigo-800/50 pt-4 md:pt-0 md:pl-8 w-full md:w-auto justify-center">
             <div className="text-center">
               <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-1">Racha Actual</div>
               <div className="text-4xl font-black text-amber-400 flex items-center justify-center gap-1">

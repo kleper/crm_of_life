@@ -54,7 +54,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         unreadCount={unreadCount}
       />
       
-      <main className="flex-1 pb-16 md:pb-0 flex flex-col relative w-full overflow-x-hidden">
+      <main className="flex-1 pb-16 md:pb-0 flex flex-col relative w-full min-w-0 overflow-x-hidden">
         <ConnectionStatusBanner />
         <NotificationSoundListener soundsEnabled={soundsEnabled} />
         <PushSubscriptionGuardian />

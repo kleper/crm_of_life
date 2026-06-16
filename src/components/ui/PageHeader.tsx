@@ -18,7 +18,7 @@ export function PageHeader({ title, description, actionLabel, onAction, children
         {description && <p className="text-slate-600 mt-2">{description}</p>}
       </div>
       
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         {children}
         {actionLabel && onAction && (
           <Button variant="accent" onClick={onAction}>
