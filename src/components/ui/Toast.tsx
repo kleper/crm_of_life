@@ -30,7 +30,7 @@ export function Toast({ message, type = "info", duration = 8000, onClose, action
   };
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 p-4 border shadow-lg flex flex-col gap-2 max-w-sm ${bgColors[type]}`}>
+    <div role="alert" className={`fixed bottom-4 right-4 z-50 p-4 border shadow-lg flex flex-col gap-2 max-w-sm ${bgColors[type]}`}>
       <div className="flex items-start justify-between gap-4">
         <p className="text-sm font-medium">{message}</p>
         <button 
@@ -38,6 +38,7 @@ export function Toast({ message, type = "info", duration = 8000, onClose, action
             setIsVisible(false);
             if (onClose) onClose();
           }}
+          aria-label="Cerrar notificación"
           className="text-slate-400 hover:text-slate-600 focus:outline-none"
         >
           ×

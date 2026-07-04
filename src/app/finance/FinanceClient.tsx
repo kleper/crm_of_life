@@ -10,6 +10,7 @@ import { Input, Select } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { toast } from "@/lib/toast";
 
 export default function FinanceClient({ categories, transactions, summary, currency }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function FinanceClient({ categories, transactions, summary, curre
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert('Error creating transaction');
+      toast.error('Error al crear transacción');
     } finally {
       setIsSubmitting(false);
     }
@@ -62,9 +63,9 @@ export default function FinanceClient({ categories, transactions, summary, curre
           <h2 className="text-[10px] md:text-sm text-slate-500 uppercase tracking-wider mb-1 md:mb-2 font-bold">Total Gastos</h2>
           <p className="text-xl md:text-4xl font-black text-red-600">{formatCurrency(summary.totalExpense, currency)}</p>
         </Card>
-        <Card className="col-span-2 md:col-span-1 flex flex-col justify-center text-center p-4 md:p-8 bg-slate-900 border-slate-900 text-white">
-          <h2 className="text-xs md:text-sm text-slate-400 uppercase tracking-wider mb-1 md:mb-2 font-bold">Balance Neto</h2>
-          <p className="text-3xl md:text-4xl font-black">{formatCurrency(summary.balance, currency)}</p>
+        <Card className="col-span-2 md:col-span-1 flex flex-col justify-center text-center p-4 md:p-8 bg-indigo-50 border-indigo-200">
+          <h2 className="text-xs md:text-sm text-indigo-600 uppercase tracking-wider mb-1 md:mb-2 font-bold">Balance Neto</h2>
+          <p className="text-3xl md:text-4xl font-black text-indigo-900">{formatCurrency(summary.balance, currency)}</p>
         </Card>
       </div>
 

@@ -24,10 +24,10 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
   if (!isOpen) return null;
 
   const maxWidths = {
-    sm: "max-w-sm",
-    md: "max-w-md",
-    lg: "max-w-lg",
-    xl: "max-w-xl"
+    sm: "max-w-[calc(100%-1rem)] sm:max-w-sm",
+    md: "max-w-[calc(100%-1rem)] sm:max-w-md",
+    lg: "max-w-[calc(100%-1rem)] sm:max-w-lg",
+    xl: "max-w-[calc(100%-1rem)] sm:max-w-xl"
   };
 
   return (
@@ -38,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
         aria-modal="true"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-100">
           <h2 className="text-xl font-bold text-slate-800">{title}</h2>
           <button 
             onClick={onClose}
@@ -53,7 +53,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
         </div>
         
         {/* Body */}
-        <div className="p-6 overflow-y-auto">
+        <div className="p-4 md:p-6 overflow-y-auto">
           {children}
         </div>
       </div>

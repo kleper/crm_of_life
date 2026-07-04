@@ -1,20 +1,34 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
 import { createContact } from "@/features/contacts/actions";
+import { toast } from "@/lib/toast";
 
 export default function ContactsClient({ initialContacts, categories }: { initialContacts: any[], categories: any[] }) {
+  const router = useRouter();
   const [contacts, setContacts] = useState(initialContacts);
   const [isPending, startTransition] = useTransition();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Gamification states
   const [showGamification, setShowGamification] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
+
+  const filteredContacts = useMemo(() => {
+    if (!searchQuery.trim()) return contacts;
+    const q = searchQuery.toLowerCase();
+    return contacts.filter((c: any) =>
+      c.name?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q) ||
+      c.phone?.toLowerCase().includes(q)
+    );
+  }, [contacts, searchQuery]);
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -28,8 +42,9 @@ export default function ContactsClient({ initialContacts, categories }: { initia
 
       await createContact(data);
       
-      // Simulate optimistic addition with a refresh
-      window.location.reload(); 
+      toast.success('Contacto creado exitosamente');
+      setIsModalOpen(false);
+      router.refresh();
     });
   };
 
@@ -41,6 +56,8 @@ export default function ContactsClient({ initialContacts, categories }: { initia
           <input 
             type="text" 
             placeholder="Buscar contactos..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <span className="absolute left-3 top-2 text-slate-400">🔍</span>
@@ -52,7 +69,7 @@ export default function ContactsClient({ initialContacts, categories }: { initia
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {contacts.map((contact) => (
+        {filteredContacts.map((contact) => (
           <Link href={`/contacts/${contact.id}`} key={contact.id} className="block group">
             <div className="bg-white border border-slate-200 p-5 h-full hover:border-indigo-400 hover:shadow-md transition-all rounded-none relative overflow-hidden">
               {contact.needsFollowUp && (

@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useId } from "react";
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -7,17 +7,23 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className = "", label, error, ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = props.id || generatedId;
+    const errorId = error ? `${inputId}-error` : undefined;
     return (
       <div className="w-full flex flex-col gap-1">
-        {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
+        {label && <label htmlFor={inputId} className="text-sm font-medium text-slate-700">{label}</label>}
         <input
           ref={ref}
+          id={inputId}
+          aria-describedby={errorId}
+          aria-invalid={error ? true : undefined}
           className={`w-full bg-white border border-slate-300 p-2 text-slate-900 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow ${
             error ? "border-red-500 focus:ring-red-500" : ""
           } ${className}`}
           {...props}
         />
-        {error && <span className="text-xs text-red-500 mt-1">{error}</span>}
+        {error && <span id={errorId} className="text-xs text-red-500 mt-1">{error}</span>}
       </div>
     );
   }
@@ -32,11 +38,17 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className = "", label, error, options, ...props }, ref) => {
+    const generatedId = useId();
+    const selectId = props.id || generatedId;
+    const errorId = error ? `${selectId}-error` : undefined;
     return (
       <div className="w-full flex flex-col gap-1">
-        {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
+        {label && <label htmlFor={selectId} className="text-sm font-medium text-slate-700">{label}</label>}
         <select
           ref={ref}
+          id={selectId}
+          aria-describedby={errorId}
+          aria-invalid={error ? true : undefined}
           className={`w-full bg-white border border-slate-300 p-2 text-slate-900 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow ${
             error ? "border-red-500 focus:ring-red-500" : ""
           } ${className}`}
@@ -48,7 +60,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <span className="text-xs text-red-500 mt-1">{error}</span>}
+        {error && <span id={errorId} className="text-xs text-red-500 mt-1">{error}</span>}
       </div>
     );
   }

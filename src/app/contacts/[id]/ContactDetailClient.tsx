@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Select, Input } from "@/components/ui/Input";
 import { updateContact, deleteContact, logInteraction } from "@/features/contacts/actions";
 import { InteractionType } from "@prisma/client";
+import { toast } from "@/lib/toast";
 
 export default function ContactDetailClient({ contact, categories }: { contact: any, categories: any[] }) {
   const router = useRouter();
@@ -30,7 +31,8 @@ export default function ContactDetailClient({ contact, categories }: { contact: 
         followUpFrequencyDays: editData.followUpFrequencyDays ? parseInt(editData.followUpFrequencyDays.toString(), 10) : undefined,
       });
       setIsEditModalOpen(false);
-      window.location.reload();
+      toast.success('Contacto actualizado');
+      router.refresh();
     });
   };
 
@@ -38,6 +40,7 @@ export default function ContactDetailClient({ contact, categories }: { contact: 
     if (confirm("¿Estás seguro de que deseas eliminar este contacto? Esta acción es irreversible.")) {
       startTransition(async () => {
         await deleteContact(contact.id);
+        toast.success('Contacto eliminado');
         router.push("/contacts");
       });
     }
@@ -56,7 +59,8 @@ export default function ContactDetailClient({ contact, categories }: { contact: 
       });
       
       setIsInteractionModalOpen(false);
-      window.location.reload();
+      toast.success('Interacción registrada');
+      router.refresh();
     });
   };
 

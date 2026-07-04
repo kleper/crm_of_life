@@ -14,7 +14,7 @@ export default async function NotificationsPage() {
   const notifications = await getNotifications();
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="px-4 py-4 md:p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <PageHeader title="Notificaciones" description="Tus alertas y recordatorios recientes." />
         <form action={markAllAsRead}>
@@ -34,7 +34,7 @@ export default async function NotificationsPage() {
             <div key={n.id} className={`flex items-center justify-between p-4 border rounded-none shadow-sm transition-colors ${n.read ? 'bg-white border-slate-200' : 'bg-indigo-50 border-indigo-200'}`}>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  {!n.read && <span className="h-2 w-2 bg-indigo-600 rounded-full inline-block"></span>}
+                  {!n.read && <span className="h-2 w-2 bg-indigo-600 rounded-none inline-block"></span>}
                   <h3 className={`text-sm ${!n.read ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>{n.title}</h3>
                 </div>
                 <p className="text-sm text-slate-600">{n.body}</p>

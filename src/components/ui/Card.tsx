@@ -16,7 +16,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       ghost: "bg-transparent border-transparent"
     };
 
-    const paddingClass = noPadding ? "" : "p-6";
+    const paddingClass = noPadding ? "" : "p-4 md:p-6";
 
     return (
       <div 

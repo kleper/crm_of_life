@@ -37,11 +37,12 @@ export function Sheet({ isOpen, onClose, title, children }: SheetProps) {
       />
 
       {/* Sheet Content */}
-      <div className="relative z-10 w-full sm:w-[480px] bg-white h-[90vh] sm:h-full flex flex-col transform transition-transform sm:border-l border-slate-200 shadow-2xl rounded-none">
+      <div role="dialog" aria-modal="true" className="relative z-10 w-full sm:w-[480px] bg-white h-[90vh] sm:h-full flex flex-col transform transition-transform sm:border-l border-slate-200 shadow-2xl rounded-none">
         <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50">
           <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{title}</h2>
           <button 
             onClick={onClose} 
+            aria-label="Cerrar"
             className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors rounded-none"
           >
             ✕

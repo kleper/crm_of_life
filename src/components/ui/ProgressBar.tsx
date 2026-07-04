@@ -15,7 +15,7 @@ export function ProgressBar({
   const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
 
   return (
-    <div className={`w-full h-1.5 bg-slate-100 border border-slate-200 rounded-none overflow-hidden ${className}`}>
+    <div role="progressbar" aria-valuenow={clampedPercentage} aria-valuemin={0} aria-valuemax={100} className={`w-full h-1.5 bg-slate-100 border border-slate-200 rounded-none overflow-hidden ${className}`}>
       <div 
         className={`h-full ${colorClass} transition-all duration-300`} 
         style={{ width: `${clampedPercentage}%` }}

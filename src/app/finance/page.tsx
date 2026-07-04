@@ -56,8 +56,7 @@ export default async function FinancePage() {
   }));
 
   return (
-    <div className="container mx-auto p-4 max-w-5xl">
-      <h1 className="text-3xl font-bold mb-6">Finance Dashboard</h1>
+    <div className="container mx-auto px-4 py-4 md:p-4 max-w-5xl">
       <FinanceClient 
         categories={plainCategories}
         transactions={transactions}

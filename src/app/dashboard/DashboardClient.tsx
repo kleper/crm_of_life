@@ -134,14 +134,14 @@ export default function DashboardClient({
         </div>
 
         {/* 2. Gamification Widget — stacks vertically on mobile, row on md+ */}
-        <Card className="flex flex-col items-center gap-4 md:flex-row md:gap-8 bg-indigo-900 text-white border-indigo-800 !p-4 md:!p-6 overflow-hidden">
+        <Card className="flex flex-col items-center gap-4 md:flex-row md:gap-8 bg-white border-indigo-200 !p-4 md:!p-6 overflow-hidden">
           
           {/* Level Ring — smaller on mobile */}
           <div className="relative flex items-center justify-center shrink-0">
             <svg width="100" height="100" className="md:w-[120px] md:h-[120px] transform -rotate-90">
               <circle 
                 cx="50" cy="50" r={radius} 
-                stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="none" 
+                stroke="#e2e8f0" strokeWidth="8" fill="none" 
                 className="md:[cx:60] md:[cy:60]"
               />
               <circle 
@@ -155,32 +155,32 @@ export default function DashboardClient({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[10px] md:text-xs font-bold text-indigo-300 uppercase tracking-wider">Nivel</span>
-              <span className="text-3xl md:text-4xl font-black text-white">{gamification.currentLevel}</span>
+              <span className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider">Nivel</span>
+              <span className="text-3xl md:text-4xl font-black text-slate-900">{gamification.currentLevel}</span>
             </div>
           </div>
           
           {/* Points info */}
           <div className="flex-1 w-full text-center md:text-left min-w-0">
             <div className="text-xl md:text-2xl font-black mb-1">
-              {gamification.totalPoints} <span className="text-indigo-300 font-medium text-base md:text-lg">pts acumulados</span>
+              <span className="text-slate-900">{gamification.totalPoints}</span> <span className="text-indigo-600 font-medium text-base md:text-lg">pts acumulados</span>
             </div>
-            <div className="text-sm text-indigo-200">
-              Faltan <strong className="text-emerald-400">{gamification.pointsMissing} pts</strong> para el Nivel {gamification.currentLevel + 1}.
+            <div className="text-sm text-slate-600">
+              Faltan <strong className="text-emerald-600">{gamification.pointsMissing} pts</strong> para el Nivel {gamification.currentLevel + 1}.
             </div>
           </div>
 
           {/* Streaks */}
-          <div className="flex gap-6 border-t md:border-t-0 md:border-l border-indigo-800/50 pt-3 md:pt-0 md:pl-8 w-full md:w-auto justify-center">
+          <div className="flex gap-6 border-t md:border-t-0 md:border-l border-indigo-200 pt-3 md:pt-0 md:pl-8 w-full md:w-auto justify-center">
             <div className="text-center">
-              <div className="text-[10px] md:text-xs font-bold text-indigo-300 uppercase tracking-wider mb-1">Racha Actual</div>
-              <div className="text-3xl md:text-4xl font-black text-amber-400 flex items-center justify-center gap-1">
+              <div className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Racha Actual</div>
+              <div className="text-3xl md:text-4xl font-black text-amber-500 flex items-center justify-center gap-1">
                 <span className="text-xl md:text-2xl">🔥</span> {gamification.currentStreak}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-[10px] md:text-xs font-bold text-indigo-300 uppercase tracking-wider mb-1">Mejor Racha</div>
-              <div className="text-3xl md:text-4xl font-black text-slate-300 flex items-center justify-center gap-1 opacity-70">
+              <div className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Mejor Racha</div>
+              <div className="text-3xl md:text-4xl font-black text-slate-400 flex items-center justify-center gap-1 opacity-70">
                 <span className="text-xl md:text-2xl">🏆</span> {gamification.longestStreak}
               </div>
             </div>

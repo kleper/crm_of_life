@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/Input";
 import { updateOrganizationGeneralSettings } from "@/features/settings/general/actions";
 import { formatCurrency } from "@/lib/currency";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { toast } from "@/lib/toast";
 
 type CountryOption = {
   code: string;
@@ -82,8 +83,8 @@ export default function GeneralSettingsClient({ tenant, countryOptions, currency
     });
   };
 
-  const toastSuccess = (msg: string) => alert(msg);
-  const toastError = (msg: string) => alert(msg);
+  const toastSuccess = (msg: string) => toast.success(msg);
+  const toastError = (msg: string) => toast.error(msg);
 
   const formattedExample = formatCurrency(1234567.89, selectedCurrency);
 

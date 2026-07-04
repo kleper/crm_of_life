@@ -90,7 +90,7 @@ export default function KudosClient({ receivedKudos, sentKudos, summary, publicW
                   {opt.label}
                 </span>
                 {hasReceived && (
-                  <span className="mt-1 text-xs font-black text-amber-700 bg-amber-200 px-2 py-0.5 rounded-full">
+                  <span className="mt-1 text-xs font-black text-amber-700 bg-amber-200 px-2 py-0.5 rounded-none">
                     x{count}
                   </span>
                 )}
