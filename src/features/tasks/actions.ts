@@ -24,13 +24,13 @@ export async function getTasksForCurrentUser() {
     return []
   }
 
-  // If TENANT_ADMIN or isSuperAdmin, return all tasks for tenant
-  // Else return only assigned tasks
-  let whereClause: any = { tenantId: currentTenantId }
-  
-  if (!isSuperAdmin && currentTenantRole !== "TENANT_ADMIN") {
-    // Only assigned or created by them or collaborator
-    whereClause.OR = [
+  // Show tasks relevant to the current user:
+  // - Assigned to them
+  // - Created by them
+  // - They are a collaborator on
+  let whereClause: any = {
+    tenantId: currentTenantId,
+    OR: [
       { assignedTo: userId },
       { createdByUserId: userId },
       { collaborators: { some: { userId: userId } } }
@@ -108,8 +108,8 @@ export async function createTask(formData: FormData) {
     }
   })
 
-  // Enviar Push Notification
-  if (task.assignedTo) {
+  // Enviar Push Notification solo si se asigna a otro usuario
+  if (task.assignedTo && task.assignedTo !== userId) {
     await sendPushToUser(task.assignedTo, {
       title: "Nueva Tarea Asignada", 
       body: task.title, 

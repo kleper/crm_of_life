@@ -132,7 +132,22 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
         : userFilteredTasks)
     : userFilteredTasks;
 
-  const todayTasks = filteredTasks.filter(t => t.dueDate && isToday(new Date(t.dueDate)) && t.status !== "DONE");
+  const todayTasks = filteredTasks.filter(t => {
+    if (!t.dueDate) return false;
+    if (!isToday(new Date(t.dueDate))) return false;
+    // Show pending tasks AND tasks completed today
+    if (t.status === 'DONE') {
+      if (!t.completedAt) return false;
+      return isToday(new Date(t.completedAt));
+    }
+    return true;
+  });
+  const sortedTodayTasks = [...todayTasks].sort((a, b) => {
+    if (a.status === 'DONE' && b.status !== 'DONE') return 1;
+    if (a.status !== 'DONE' && b.status === 'DONE') return -1;
+    return 0;
+  });
+  const pendingTodayCount = sortedTodayTasks.filter(t => t.status !== 'DONE').length;
   const overdueTasks = filteredTasks.filter(t => t.dueDate && isOverdue(new Date(t.dueDate)) && t.status !== "DONE");
 
   const upcomingSubtasks = optimisticTasks.flatMap(task => 
@@ -317,7 +332,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                       <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-amber-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
                         <div className="flex items-center gap-3">
                           <button 
-                            className="w-8 h-8 rounded-full border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
+                            className="w-8 h-8 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
@@ -347,9 +362,9 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               <section>
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
                   <span>Hoy — {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-                  <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5">{todayTasks.length}</span>
+                  <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5">{pendingTodayCount}/{sortedTodayTasks.length}</span>
                 </h3>
-                {todayTasks.length === 0 ? (
+                {sortedTodayTasks.length === 0 ? (
                   <div className="text-center py-12 bg-white border border-dashed border-slate-300">
                     <p className="text-slate-500 font-medium">
                       {overdueTasks.length === 0 ? "¡Todo al día por hoy! 🎉" : "No hay nuevas tareas para hoy"}
@@ -357,28 +372,38 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {todayTasks.map(task => (
-                      <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-indigo-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
-                        <div className="flex items-center gap-3">
-                          <button 
-                            className="w-8 h-8 rounded-full border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
-                            }}
-                          />
-                          <div>
-                            <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{task.title}</h4>
-                            <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
-                              {task.dueTime ? <span>🕒 {task.dueTime}</span> : <span>Todo el día</span>}
-                              {task.categoryId && <span>• {categories.find((c:any) => c.id === task.categoryId)?.name}</span>}
-                              {task.recurrenceRule && <span>• 🔁</span>}
+                    {sortedTodayTasks.map(task => {
+                      const isDone = task.status === 'DONE';
+                      return (
+                        <div key={task.id} onClick={() => handleTaskClick(task)} className={`bg-white border-l-4 ${isDone ? 'border-l-emerald-400 opacity-60' : 'border-l-indigo-500'} border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group`}>
+                          <div className="flex items-center gap-3">
+                            {isDone ? (
+                              <div className="w-8 h-8 rounded-none bg-emerald-100 border-2 border-emerald-400 shrink-0 flex items-center justify-center">
+                                <span className="text-emerald-600 text-sm">✓</span>
+                              </div>
+                            ) : (
+                              <button 
+                                className="w-8 h-8 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
+                                }}
+                              />
+                            )}
+                            <div>
+                              <h4 className={`font-bold ${isDone ? 'line-through text-slate-400' : 'text-slate-900 group-hover:text-indigo-600'} transition-colors line-clamp-1`}>{task.title}</h4>
+                              <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
+                                {task.dueTime ? <span>🕒 {task.dueTime}</span> : <span>Todo el día</span>}
+                                {task.categoryId && <span>• {categories.find((c:any) => c.id === task.categoryId)?.name}</span>}
+                                {task.recurrenceRule && <span>• 🔁</span>}
+                                {isDone && <span className="text-emerald-600">✓ Completada</span>}
+                              </div>
                             </div>
                           </div>
+                          {!isDone && <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>}
                         </div>
-                        <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </section>

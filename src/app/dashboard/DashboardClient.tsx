@@ -96,32 +96,38 @@ export default function DashboardClient({
 
         {/* 1. Summary Cards — 2x2 grid on mobile, 4 cols on md+ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-          <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4">
-            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-            </div>
-            <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10">Hoy</span>
-            <span className="text-2xl md:text-3xl font-black text-indigo-600 mt-0.5 relative z-10">{productivity.completedToday}</span>
-            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-0.5 relative z-10 leading-tight">tareas completadas</span>
-          </Card>
+          <Link href="/tasks" className="block">
+            <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all rounded-none">
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+              </div>
+              <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10">Hoy</span>
+              <span className="text-2xl md:text-3xl font-black text-indigo-600 mt-0.5 relative z-10">{productivity.completedToday}</span>
+              <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-0.5 relative z-10 leading-tight">tareas completadas</span>
+            </Card>
+          </Link>
           
-          <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4">
-            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            </div>
-            <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10">Semana</span>
-            <span className="text-2xl md:text-3xl font-black text-indigo-600 mt-0.5 relative z-10">{productivity.completedThisWeek}</span>
-            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-0.5 relative z-10 leading-tight">tareas completadas</span>
-          </Card>
+          <Link href="/tasks" className="block">
+            <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all rounded-none">
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              </div>
+              <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10">Semana</span>
+              <span className="text-2xl md:text-3xl font-black text-indigo-600 mt-0.5 relative z-10">{productivity.completedThisWeek}</span>
+              <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-0.5 relative z-10 leading-tight">tareas completadas</span>
+            </Card>
+          </Link>
           
-          <Card variant={productivity.overdue > 0 ? 'alert' : 'default'} className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4">
-            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-            </div>
-            <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider relative z-10 ${productivity.overdue > 0 ? 'text-red-500' : 'text-slate-500'}`}>Vencidas</span>
-            <span className={`text-2xl md:text-3xl font-black mt-0.5 relative z-10 ${productivity.overdue > 0 ? 'text-red-600' : 'text-slate-600'}`}>{productivity.overdue}</span>
-            <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-0.5 relative z-10 leading-tight">tareas atrasadas</span>
-          </Card>
+          <Link href="/tasks" className="block">
+            <Card variant={productivity.overdue > 0 ? 'alert' : 'default'} className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all rounded-none">
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+              </div>
+              <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider relative z-10 ${productivity.overdue > 0 ? 'text-red-500' : 'text-slate-500'}`}>Vencidas</span>
+              <span className={`text-2xl md:text-3xl font-black mt-0.5 relative z-10 ${productivity.overdue > 0 ? 'text-red-600' : 'text-slate-600'}`}>{productivity.overdue}</span>
+              <span className="text-[9px] md:text-xs font-bold text-slate-400 mt-0.5 relative z-10 leading-tight">tareas atrasadas</span>
+            </Card>
+          </Link>
           
           <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4">
             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">

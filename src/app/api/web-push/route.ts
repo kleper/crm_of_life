@@ -21,30 +21,29 @@ export async function POST(req: Request) {
   try {
     const subscription = await req.json();
 
-    const existing = await prisma.pushSubscription.findUnique({
-      where: { endpoint: subscription.endpoint }
-    });
-
-    if (!existing) {
-      await prisma.pushSubscription.create({
-        data: {
-          userId,
-          organizationId,
-          endpoint: subscription.endpoint,
-          p256dh: subscription.keys.p256dh,
-          auth: subscription.keys.auth,
-        }
-      });
-    } else {
-      // Si ya existe pero para otro usuario/org lo actualizamos
-      await prisma.pushSubscription.update({
-        where: { endpoint: subscription.endpoint },
-        data: {
-          userId,
-          organizationId,
-        }
-      });
+    // Validate the subscription body
+    if (!subscription || !subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) {
+      return NextResponse.json({ error: "Invalid subscription format" }, { status: 400 });
     }
+
+    // Upsert: create if new, update keys if the endpoint already exists
+    // This handles re-subscriptions after browser/OS purges the subscription
+    await prisma.pushSubscription.upsert({
+      where: { endpoint: subscription.endpoint },
+      update: {
+        userId,
+        organizationId,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+      },
+      create: {
+        userId,
+        organizationId,
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "./ui/Button";
+import { toast } from "@/lib/toast";
 
 export function NotificationPrompt() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
@@ -31,11 +32,18 @@ export function NotificationPrompt() {
           applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
         });
 
-        await fetch("/api/push/subscribe", {
+        const res = await fetch("/api/web-push", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(subscription),
         });
+
+        if (res.ok) {
+          toast.success("Notificaciones activadas correctamente");
+        } else {
+          console.error("Error al guardar suscripción push:", await res.text());
+          toast.error("Error al activar notificaciones");
+        }
         
         console.log("Push subscription successful.");
       }
@@ -46,12 +54,12 @@ export function NotificationPrompt() {
 
   if (permission === "default") {
     return (
-      <div className="bg-slate-900 text-white p-4 flex flex-col sm:flex-row items-center justify-between rounded-none shadow-md">
+      <div className="bg-indigo-50 text-slate-900 p-4 flex flex-col sm:flex-row items-center justify-between rounded-none shadow-sm border border-indigo-200 border-l-4 border-l-indigo-500">
         <div className="mb-3 sm:mb-0">
-          <h3 className="font-bold text-sm">Habilita las notificaciones</h3>
-          <p className="text-xs text-slate-300">Recibe alertas sobre nuevas tareas y logros alcanzados.</p>
+          <h3 className="font-bold text-sm text-slate-900">Habilita las notificaciones</h3>
+          <p className="text-xs text-slate-600">Recibe alertas sobre nuevas tareas y logros alcanzados.</p>
         </div>
-        <Button onClick={subscribeToPush} variant="primary" className="bg-white text-slate-900 hover:bg-slate-100 whitespace-nowrap text-sm px-4 py-2">
+        <Button onClick={subscribeToPush} variant="primary" className="whitespace-nowrap text-sm px-4 py-2">
           Habilitar
         </Button>
       </div>

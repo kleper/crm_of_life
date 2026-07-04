@@ -29,7 +29,7 @@ export function PushSubscriptionGuardian() {
                 applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
               });
               
-              await fetch("/api/push/subscribe", {
+              await fetch("/api/web-push", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newSubscription),
@@ -61,7 +61,7 @@ export function PushSubscriptionGuardian() {
         applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
       });
       
-      await fetch("/api/push/subscribe", {
+      await fetch("/api/web-push", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newSubscription),
