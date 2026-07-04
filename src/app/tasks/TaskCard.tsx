@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { calculateTaskProgress } from "@/lib/subtasks";
+import { Repeat } from "@/components/ui/Icons";
 
 export default function TaskCard({ task, onClick }: { task: any, onClick?: () => void }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -45,14 +46,14 @@ export default function TaskCard({ task, onClick }: { task: any, onClick?: () =>
         <div className="flex justify-between items-start mb-2">
           <h3 className={`font-bold text-sm flex gap-1 items-center min-w-0 ${task.status === "DONE" ? 'line-through text-slate-500' : 'text-slate-900'}`}>
             {task.recurringTemplateId && (
-              <span className="text-[12px] opacity-70" title="Parte de una serie recurrente">🔁</span>
+              <Repeat className="w-3 h-3 opacity-70" />
             )}
             <span className="truncate">{task.title}</span>
           </h3>
           <div className="flex items-center gap-1 shrink-0 ml-2">
             {task._recurringCount > 1 && (
               <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 border border-indigo-200 whitespace-nowrap" title={`${task._recurringCount} instancias pendientes`}>
-                🔁 x{task._recurringCount}
+                <Repeat className="w-3 h-3 inline" /> x{task._recurringCount}
               </span>
             )}
             <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-200 shrink-0">

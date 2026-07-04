@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import LogoutButton from "../LogoutButton";
 import { ActiveOrgIndicator, TenantInfo } from "./ActiveOrgIndicator";
+import Icons from "@/components/ui/Icons";
 
 interface NavigationClientProps {
   canManage: boolean;
@@ -21,15 +22,15 @@ export default function NavigationClient({ canManage, userName, userTenants, act
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: "📊" },
-    { name: "Tareas", href: "/tasks", icon: "✅" },
-    { name: "Contactos", href: "/contacts", icon: "👥" },
-    { name: "Finanzas", href: "/finance", icon: "💰" },
-    { name: "Kudos", href: "/kudos", icon: "🏆" },
+    { name: "Dashboard", href: "/dashboard", icon: Icons.Dashboard },
+    { name: "Tareas", href: "/tasks", icon: Icons.CheckSquare },
+    { name: "Contactos", href: "/contacts", icon: Icons.Users },
+    { name: "Finanzas", href: "/finance", icon: Icons.Wallet },
+    { name: "Kudos", href: "/kudos", icon: Icons.Trophy },
   ];
 
   const adminItems = [
-    { name: "Panel Admin", href: "/admin", icon: "⚙️" },
+    { name: "Panel Admin", href: "/admin", icon: Icons.Settings },
   ];
 
   const isActive = (path: string) => pathname?.startsWith(path);
@@ -40,17 +41,21 @@ export default function NavigationClient({ canManage, userName, userTenants, act
       {/* Mobile Top Bar */}
       <div className="md:hidden fixed top-0 left-0 w-full h-14 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-4 shadow-sm">
         <Link href="/dashboard" className="font-black text-indigo-700 tracking-tighter">CRM VIDA</Link>
-        <div className="flex items-center gap-4">
-          <Link href="/notifications" className="relative text-xl text-slate-600">
-            🔔
+        <div className="flex items-center gap-2">
+          <Link href="/notifications" aria-label="Notificaciones" className="relative w-11 h-11 flex items-center justify-center text-slate-600">
+            <Icons.Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+              <span className="absolute top-1 right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
           </Link>
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-2xl text-slate-700">
-            {isMobileMenuOpen ? "✕" : "☰"}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Menú"
+            className="w-11 h-11 flex items-center justify-center text-slate-700 cursor-pointer"
+          >
+            {isMobileMenuOpen ? <Icons.X className="w-6 h-6" /> : <Icons.Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
@@ -82,9 +87,9 @@ export default function NavigationClient({ canManage, userName, userTenants, act
                   key={item.href} 
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`p-4 border ${isActive(item.href) ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+                  className={`flex items-center p-4 border cursor-pointer ${isActive(item.href) ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
                 >
-                  <span className="mr-3">{item.icon}</span> {item.name}
+                  <item.icon className="w-5 h-5 mr-3" /> {item.name}
                 </Link>
               ))}
             </div>
@@ -103,9 +108,13 @@ export default function NavigationClient({ canManage, userName, userTenants, act
             key={item.href} 
             href={item.href}
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`flex flex-col items-center justify-center w-full h-full ${isActive(item.href) ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`flex flex-col items-center justify-center w-full h-full ${
+              isActive(item.href)
+                ? 'text-indigo-600 border-t-2 border-indigo-600'
+                : 'text-slate-500 hover:text-slate-800 border-t-2 border-transparent'
+            }`}
           >
-            <span className="text-xl mb-1">{item.icon}</span>
+            <item.icon className="w-6 h-6 mb-0.5" />
             <span className="text-[10px] font-bold">{item.name}</span>
           </Link>
         ))}
@@ -117,10 +126,10 @@ export default function NavigationClient({ canManage, userName, userTenants, act
           <Link href="/dashboard" className="font-black text-xl text-indigo-700 tracking-tighter">
             CRM VIDA
           </Link>
-          <Link href="/notifications" className="relative text-xl text-slate-600 hover:text-indigo-600 transition-colors">
-            🔔
+          <Link href="/notifications" aria-label="Notificaciones" className="relative text-slate-600 hover:text-indigo-600 transition-colors">
+            <Icons.Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 shadow-sm">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -145,7 +154,7 @@ export default function NavigationClient({ canManage, userName, userTenants, act
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-4 border-transparent'
                 }`}
               >
-                <span className="mr-3">{item.icon}</span> {item.name}
+                <item.icon className="w-5 h-5 mr-3" /> {item.name}
               </Link>
             ))}
           </div>
@@ -156,20 +165,20 @@ export default function NavigationClient({ canManage, userName, userTenants, act
               <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 px-3">Configuración</div>
               
               <Link href="/settings/general" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${isActive('/settings/general') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
-                <span className="opacity-70">🌍</span>
+                <Icons.Globe className="w-5 h-5 opacity-70" />
                 General
               </Link>
               
               <Link href="/settings/categories" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${isActive('/settings/categories') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
-                <span className="w-5 flex justify-center text-lg">🏷️</span> Categorías
+                <Icons.Tag className="w-5 h-5" /> Categorías
               </Link>
               <Link href="/settings/notifications" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${isActive('/settings/notifications') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
-                <span className="w-5 flex justify-center text-lg">🔔</span> Notificaciones
+                <Icons.Bell className="w-5 h-5" /> Notificaciones
               </Link>
 
               {isSuperAdmin && (
                 <Link href="/admin" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${isActive('/admin') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
-                  <span className="opacity-70">⚙️</span>
+                  <Icons.Settings className="w-5 h-5 opacity-70" />
                   Panel Admin
                 </Link>
               )}
@@ -181,7 +190,7 @@ export default function NavigationClient({ canManage, userName, userTenants, act
         <div className="p-4 border-t border-slate-200 relative">
           <button 
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="w-full flex items-center justify-between bg-slate-50 hover:bg-slate-100 p-2 border border-slate-200 transition-colors"
+            className="w-full flex items-center justify-between bg-slate-50 hover:bg-slate-100 p-2 border border-slate-200 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2 overflow-hidden">
               <div className="w-8 h-8 bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center shrink-0 text-xs">
@@ -189,7 +198,7 @@ export default function NavigationClient({ canManage, userName, userTenants, act
               </div>
               <span className="text-sm font-bold text-slate-700 truncate">{userName}</span>
             </div>
-            <span className="text-xs text-slate-400">▲</span>
+            <Icons.ChevronUp className="w-4 h-4 text-slate-400" />
           </button>
           
           {isUserMenuOpen && (

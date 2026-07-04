@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { pauseRecurringTaskTemplate, resumeRecurringTaskTemplate, deleteRecurringTaskTemplate } from "@/features/tasks/recurring-actions";
+import Icons from "@/components/ui/Icons";
 
 export default function RecurringTasksClient({ initialTemplates }: { initialTemplates: any[] }) {
   const [isPending, startTransition] = useTransition();
@@ -29,7 +30,7 @@ export default function RecurringTasksClient({ initialTemplates }: { initialTemp
   if (!initialTemplates.length) {
     return (
       <div className="bg-white border border-slate-200 p-8 text-center flex flex-col items-center justify-center gap-4 rounded-none">
-        <div className="text-4xl">🔁</div>
+        <Icons.Repeat className="w-10 h-10 text-slate-300" />
         <h3 className="text-lg font-bold text-slate-800">Aún no tienes tareas recurrentes</h3>
         <p className="text-sm text-slate-500 max-w-sm">
           Crea rutinas que se repitan automáticamente — perfecto para hábitos diarios o tareas semanales.
@@ -51,7 +52,7 @@ export default function RecurringTasksClient({ initialTemplates }: { initialTemp
               </div>
               {template.description && <p className="text-xs text-slate-500 mb-2">{template.description}</p>}
               <div className="flex items-center gap-1 text-xs text-indigo-700 font-medium bg-indigo-50 px-2 py-1 inline-flex border border-indigo-100">
-                🔁 {template.humanizedRRule}
+                <Icons.Repeat className="w-3.5 h-3.5" /> {template.humanizedRRule}
               </div>
               <div className="mt-2 text-[10px] text-slate-400 font-bold uppercase">
                 {template._count.generatedTasks} tareas pendientes generadas

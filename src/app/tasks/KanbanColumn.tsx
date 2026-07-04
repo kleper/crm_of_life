@@ -3,6 +3,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { TaskStatus } from "@prisma/client";
 import TaskCard from "./TaskCard";
+import Icons from "@/components/ui/Icons";
 
 interface KanbanColumnProps {
   id: TaskStatus;
@@ -40,7 +41,7 @@ export default function KanbanColumn({ id, title, tasks, onTaskClick }: KanbanCo
         ))}
         {tasks.length === 0 && (
           <div className="flex-1 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center p-6 text-center opacity-60">
-            <span className="text-2xl mb-2 text-slate-400">📥</span>
+            <span className="mb-2 text-slate-400"><Icons.Inbox className="w-6 h-6" /></span>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sin tareas</span>
             <span className="text-xs text-slate-400 mt-1">Arrastra una tarea aquí</span>
           </div>

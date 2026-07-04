@@ -15,6 +15,7 @@ import { toast } from "@/lib/toast";
 import { Toast } from "@/components/ui/Toast";
 import SendKudoModal from "@/components/kudos/SendKudoModal";
 import RecurrenceBuilder from "@/components/tasks/RecurrenceBuilder";
+import Icons from "@/components/ui/Icons";
 
 function Avatar({ name, image, size = "md" }: { name: string, image?: string | null, size?: "sm" | "md" }) {
   const initial = name ? name.charAt(0).toUpperCase() : "?";
@@ -359,7 +360,8 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
                         type="button" 
                         onClick={() => handleDeleteSubtask(st.id)}
                         disabled={isPending}
-                        className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="w-8 h-8 min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center text-slate-300 hover:text-red-500 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
+                        aria-label="Eliminar microtarea"
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                       </button>
@@ -450,7 +452,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
                   className="text-xs"
                   onClick={() => setShowRecurrencePanel(!showRecurrencePanel)}
                 >
-                  {showRecurrencePanel ? "Cancelar" : "🔁 Hacer Recurrente"}
+                  {showRecurrencePanel ? "Cancelar" : <><Icons.Repeat className="w-4 h-4" /> Hacer Recurrente</>}
                 </Button>
               </div>
 
@@ -488,7 +490,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
           <>
             <hr className="border-slate-200" />
             <div className="flex items-center gap-2 p-3 bg-indigo-50 border border-indigo-200">
-              <span className="text-lg">🔁</span>
+              <Icons.Repeat className="w-5 h-5 text-indigo-600" />
               <div>
                 <p className="text-sm font-bold text-indigo-800">Tarea Recurrente</p>
                 <p className="text-xs text-indigo-600">Esta tarea es parte de una serie recurrente. Gestiona la rutina desde el panel de Rutinas.</p>
@@ -506,7 +508,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
             Eliminar
           </Button>
           <div className="flex gap-3">
-            <span className="text-xs text-slate-400 flex items-center">{isPending ? "● Guardando..." : "✓ Al día"}</span>
+            <span className="text-xs text-slate-400 flex items-center gap-1">{isPending ? <><Icons.Clock className="w-3 h-3 animate-pulse" /> Guardando...</> : <><Icons.Check className="w-3 h-3" /> Al día</>}</span>
             <Button type="button" variant="secondary" onClick={onClose} disabled={isPending}>Cerrar</Button>
           </div>
         </div>
@@ -524,7 +526,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
           <div className="flex gap-2 items-center mt-2">
             <div className="flex -space-x-2 mr-2">
               {taskCollaborators.filter((tu: any) => tu.user.id !== currentUserId).slice(0, 3).map((tu: any) => (
-                <div key={tu.user.id} className="relative z-10 inline-block rounded-full ring-2 ring-white">
+                <div key={tu.user.id} className="relative z-10 inline-block rounded-none ring-2 ring-white">
                    <Avatar name={tu.user.name} image={tu.user.image} size="sm" />
                 </div>
               ))}

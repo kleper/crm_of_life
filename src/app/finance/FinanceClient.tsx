@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { toast } from "@/lib/toast";
+import Icons from "@/components/ui/Icons";
 
 export default function FinanceClient({ categories, transactions, summary, currency }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,7 +98,7 @@ export default function FinanceClient({ categories, transactions, summary, curre
         <Card className="flex flex-col max-h-[450px]">
           <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-2">
             <h2 className="text-xl font-bold text-slate-800">Transacciones Recientes</h2>
-            <Button size="sm" onClick={() => setIsModalOpen(true)}>+ Nueva</Button>
+            <Button size="sm" onClick={() => setIsModalOpen(true)} className="min-h-[44px] md:min-h-0"><Icons.Plus className="w-4 h-4" /> Nueva</Button>
           </div>
           <div className="space-y-4 overflow-y-auto pr-2 flex-1">
             {transactions.length === 0 && (
@@ -108,7 +109,7 @@ export default function FinanceClient({ categories, transactions, summary, curre
               />
             )}
             {transactions.map((t: any) => (
-              <div key={t.id} className="flex justify-between items-center border-b border-slate-50 pb-3">
+              <div key={t.id} className="flex justify-between items-center border-b border-slate-50 pb-3 cursor-pointer hover:bg-slate-50 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 rounded-none" style={{ backgroundColor: t.category.color }} title={t.category.name} />
                   <div>

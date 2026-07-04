@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { X } from "./Icons";
 
 interface ToastProps {
   message: string;
@@ -30,7 +31,10 @@ export function Toast({ message, type = "info", duration = 8000, onClose, action
   };
 
   return (
-    <div role="alert" className={`fixed bottom-4 right-4 z-50 p-4 border shadow-lg flex flex-col gap-2 max-w-sm ${bgColors[type]}`}>
+    <div
+      role="alert"
+      className={`fixed bottom-20 md:bottom-4 right-4 z-50 p-4 border shadow-lg flex flex-col gap-2 max-w-sm rounded-none motion-safe:animate-in motion-safe:slide-in-from-right ${bgColors[type]}`}
+    >
       <div className="flex items-start justify-between gap-4">
         <p className="text-sm font-medium">{message}</p>
         <button 
@@ -39,9 +43,9 @@ export function Toast({ message, type = "info", duration = 8000, onClose, action
             if (onClose) onClose();
           }}
           aria-label="Cerrar notificación"
-          className="text-slate-400 hover:text-slate-600 focus:outline-none"
+          className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center -m-2 text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
         >
-          ×
+          <X className="w-4 h-4" />
         </button>
       </div>
       {action && <div className="mt-1">{action}</div>}

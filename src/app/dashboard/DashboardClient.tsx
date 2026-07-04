@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getKudoOptions } from "@/lib/kudos";
 import { formatCurrency } from "@/lib/currency";
+import Icons from "@/components/ui/Icons";
 
 interface DashboardClientProps {
   productivity: {
@@ -99,7 +100,7 @@ export default function DashboardClient({
           <Link href="/tasks" className="block">
             <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all rounded-none">
               <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                <Icons.Calendar className="w-7 h-7 md:w-10 md:h-10" />
               </div>
               <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10">Hoy</span>
               <span className="text-2xl md:text-3xl font-black text-indigo-600 mt-0.5 relative z-10">{productivity.completedToday}</span>
@@ -110,7 +111,7 @@ export default function DashboardClient({
           <Link href="/tasks" className="block">
             <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all rounded-none">
               <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                <Icons.TrendingUp className="w-7 h-7 md:w-10 md:h-10" />
               </div>
               <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10">Semana</span>
               <span className="text-2xl md:text-3xl font-black text-indigo-600 mt-0.5 relative z-10">{productivity.completedThisWeek}</span>
@@ -121,7 +122,7 @@ export default function DashboardClient({
           <Link href="/tasks" className="block">
             <Card variant={productivity.overdue > 0 ? 'alert' : 'default'} className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all rounded-none">
               <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                <Icons.AlertTriangle className="w-7 h-7 md:w-10 md:h-10" />
               </div>
               <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider relative z-10 ${productivity.overdue > 0 ? 'text-red-500' : 'text-slate-500'}`}>Vencidas</span>
               <span className={`text-2xl md:text-3xl font-black mt-0.5 relative z-10 ${productivity.overdue > 0 ? 'text-red-600' : 'text-slate-600'}`}>{productivity.overdue}</span>
@@ -129,9 +130,9 @@ export default function DashboardClient({
             </Card>
           </Link>
           
-          <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4">
+          <Card className="flex flex-col justify-between relative overflow-hidden group !p-3 md:!p-4 cursor-pointer">
             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[40px] md:h-[40px]"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <Icons.Target className="w-7 h-7 md:w-10 md:h-10" />
             </div>
             <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider relative z-10 leading-tight">Tasa de Éxito</span>
             <span className="text-2xl md:text-3xl font-black text-emerald-500 mt-0.5 relative z-10">{productivity.completionRate}%</span>
@@ -157,7 +158,7 @@ export default function DashboardClient({
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 strokeLinecap="round"
-                className="transition-all duration-1000 ease-out md:[cx:60] md:[cy:60]"
+                className="transition-all duration-500 ease-out md:[cx:60] md:[cy:60]"
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -181,13 +182,13 @@ export default function DashboardClient({
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Racha Actual</div>
               <div className="text-3xl md:text-4xl font-black text-amber-500 flex items-center justify-center gap-1">
-                <span className="text-xl md:text-2xl">🔥</span> {gamification.currentStreak}
+                <Icons.Flame className="w-5 h-5 md:w-6 md:h-6 text-amber-500" /> {gamification.currentStreak}
               </div>
             </div>
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Mejor Racha</div>
               <div className="text-3xl md:text-4xl font-black text-slate-400 flex items-center justify-center gap-1 opacity-70">
-                <span className="text-xl md:text-2xl">🏆</span> {gamification.longestStreak}
+                <Icons.Trophy className="w-5 h-5 md:w-6 md:h-6" /> {gamification.longestStreak}
               </div>
             </div>
           </div>
@@ -207,7 +208,7 @@ export default function DashboardClient({
                     actionLabel="Ir a Tareas"
                     onAction={() => router.push("/tasks")}
                     className="border-none shadow-none bg-transparent py-4"
-                    icon={<span className="text-4xl">📊</span>}
+                    icon={<Icons.Dashboard className="w-10 h-10 text-slate-400" />}
                   />
                 </div>
               ) : null}
@@ -232,7 +233,7 @@ export default function DashboardClient({
                       )}
                       {hasWeeklyData && (
                         <div 
-                          className="w-full bg-indigo-500 transition-all duration-1000 ease-out hover:bg-indigo-400" 
+                          className="w-full bg-indigo-500 transition-all duration-500 ease-out hover:bg-indigo-400" 
                           style={{ height: `${heightPct}%` }}
                         ></div>
                       )}
@@ -256,7 +257,7 @@ export default function DashboardClient({
                     actionLabel="Crear Tarea"
                     onAction={() => router.push("/tasks")}
                     className="border-none shadow-none bg-transparent py-4"
-                    icon={<span className="text-4xl">🏷️</span>}
+                    icon={<Icons.Tag className="w-10 h-10 text-slate-400" />}
                   />
                 </div>
               ) : (
@@ -271,7 +272,7 @@ export default function DashboardClient({
                         <span className="text-slate-500 whitespace-nowrap">{cat.count} <span className="text-indigo-600">({cat.totalPoints} pts)</span></span>
                       </div>
                       <div className="h-2 bg-slate-100 w-full overflow-hidden">
-                        <div className={`h-full ${cat.color} transition-all duration-1000`} style={{ width: `${widthPct}%` }}></div>
+                        <div className={`h-full ${cat.color} transition-all duration-500`} style={{ width: `${widthPct}%` }}></div>
                       </div>
                     </div>
                   );
@@ -321,7 +322,7 @@ export default function DashboardClient({
                     title="Al Día" 
                     description="No tienes contactos que requieran seguimiento atrasado."
                     className="border-none shadow-none bg-transparent py-4"
-                    icon={<span className="text-4xl">🌟</span>}
+                    icon={<Icons.Star className="w-10 h-10 text-slate-400" />}
                   />
                 </div>
               ) : (
@@ -395,7 +396,7 @@ export default function DashboardClient({
                     <th className="px-2 md:px-4 py-2 md:py-3">Usuario</th>
                     <th className="px-2 md:px-4 py-2 md:py-3">Lvl</th>
                     <th className="px-2 md:px-4 py-2 md:py-3">Pts</th>
-                    <th className="px-2 md:px-4 py-2 md:py-3">🔥</th>
+                    <th className="px-2 md:px-4 py-2 md:py-3"><Icons.Flame className="w-4 h-4 text-amber-500 inline-block" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -407,7 +408,13 @@ export default function DashboardClient({
                       }`}
                     >
                       <td className="px-2 md:px-4 py-2 md:py-3 font-black text-slate-900 text-base md:text-lg">
-                        {row.position === 1 ? '🥇' : row.position === 2 ? '🥈' : row.position === 3 ? '🥉' : `#${row.position}`}
+                        {row.position <= 3 ? (
+                          <span className={`inline-flex items-center justify-center w-7 h-7 md:w-8 md:h-8 font-black text-xs md:text-sm text-white ${
+                            row.position === 1 ? 'bg-amber-400' : row.position === 2 ? 'bg-slate-400' : 'bg-amber-700'
+                          }`}>
+                            {row.position}
+                          </span>
+                        ) : `#${row.position}`}
                       </td>
                       <td className="px-2 md:px-4 py-2 md:py-3 font-bold text-slate-800">
                         <span className="truncate block max-w-[100px] md:max-w-none">{row.name}</span>
@@ -440,7 +447,7 @@ export default function DashboardClient({
                       </div>
                       <div className="min-w-0">
                         <div className="font-bold text-slate-800 leading-none text-sm md:text-base truncate">{collab.name}</div>
-                        {index === 0 && <div className="text-[9px] md:text-[10px] font-black text-indigo-600 uppercase tracking-wider mt-1">Colaborador Estrella ⭐</div>}
+                        {index === 0 && <div className="text-[9px] md:text-[10px] font-black text-indigo-600 uppercase tracking-wider mt-1 flex items-center gap-1">Colaborador Estrella <Icons.Star className="w-3.5 h-3.5 text-amber-500" /></div>}
                       </div>
                     </div>
                   </div>

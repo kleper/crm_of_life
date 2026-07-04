@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
 import { createContact } from "@/features/contacts/actions";
 import { toast } from "@/lib/toast";
+import Icons from "@/components/ui/Icons";
 
 export default function ContactsClient({ initialContacts, categories }: { initialContacts: any[], categories: any[] }) {
   const router = useRouter();
@@ -58,9 +59,9 @@ export default function ContactsClient({ initialContacts, categories }: { initia
             placeholder="Buscar contactos..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
-          <span className="absolute left-3 top-2 text-slate-400">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Search className="w-4 h-4" /></span>
         </div>
         <Button variant="primary" onClick={() => setIsModalOpen(true)} className="w-full md:w-auto whitespace-nowrap">
           + Nuevo Contacto
@@ -70,7 +71,7 @@ export default function ContactsClient({ initialContacts, categories }: { initia
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredContacts.map((contact) => (
-          <Link href={`/contacts/${contact.id}`} key={contact.id} className="block group">
+          <Link href={`/contacts/${contact.id}`} key={contact.id} className="block group cursor-pointer">
             <div className="bg-white border border-slate-200 p-5 h-full hover:border-indigo-400 hover:shadow-md transition-all rounded-none relative overflow-hidden">
               {contact.needsFollowUp && (
                 <div className="absolute top-0 right-0 w-2 h-full bg-amber-400"></div>
@@ -92,8 +93,8 @@ export default function ContactsClient({ initialContacts, categories }: { initia
               </div>
 
               <div className="space-y-2 text-sm text-slate-600 mb-4">
-                {contact.email && <div className="flex items-center gap-2"><span className="opacity-50">✉️</span> {contact.email}</div>}
-                {contact.phone && <div className="flex items-center gap-2"><span className="opacity-50">📱</span> {contact.phone}</div>}
+                {contact.email && <div className="flex items-center gap-2"><Icons.Mail className="w-4 h-4 text-slate-400 shrink-0" /> {contact.email}</div>}
+                {contact.phone && <div className="flex items-center gap-2"><Icons.Phone className="w-4 h-4 text-slate-400 shrink-0" /> {contact.phone}</div>}
               </div>
 
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
@@ -114,7 +115,7 @@ export default function ContactsClient({ initialContacts, categories }: { initia
       {/* Empty State */}
       {contacts.length === 0 && (
         <div className="bg-white border border-slate-200 p-12 text-center">
-          <div className="text-4xl mb-4">👥</div>
+          <div className="text-slate-300 mb-4"><Icons.Users className="w-12 h-12" /></div>
           <h3 className="text-lg font-bold text-slate-800 mb-2">No tienes contactos</h3>
           <p className="text-slate-500 mb-6 max-w-md mx-auto">Añade tu primer contacto para empezar a construir y mantener relaciones significativas.</p>
           <Button variant="primary" onClick={() => setIsModalOpen(true)}>Añadir mi primer contacto</Button>

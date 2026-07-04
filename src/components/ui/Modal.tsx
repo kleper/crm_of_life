@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
+import { X } from "./Icons";
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,6 +10,9 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: ModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = `modal-title-${title.replace(/\s+/g, '-').toLowerCase()}`;
+
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -21,6 +25,24 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
     };
   }, [isOpen]);
 
+  // Escape key handler
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  }, [onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      // Focus the dialog on open for screen readers
+      dialogRef.current?.focus();
+    }
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, handleKeyDown]);
+
   if (!isOpen) return null;
 
   const maxWidths = {
@@ -31,24 +53,28 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div 
+        ref={dialogRef}
         className={`bg-white rounded-none shadow-2xl w-full ${maxWidths[maxWidth]} flex flex-col max-h-[90vh]`}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-800">{title}</h2>
+          <h2 id={titleId} className="text-xl font-bold text-slate-800">{title}</h2>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 transition-colors p-1"
-            aria-label="Close modal"
+            className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            aria-label="Cerrar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            <X className="w-5 h-5" />
           </button>
         </div>
         

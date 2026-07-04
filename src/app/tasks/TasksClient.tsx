@@ -16,6 +16,7 @@ import { Input, Select } from "@/components/ui/Input";
 import RecurrenceBuilder from "@/components/tasks/RecurrenceBuilder";
 import { createRecurringTaskTemplate } from "@/features/tasks/recurring-actions";
 import Link from "next/link";
+import Icons from "@/components/ui/Icons";
 
 interface TasksClientProps {
   initialTasks: any[];
@@ -249,7 +250,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               <div className="text-center border-l border-slate-200 pl-4 md:pl-6 shrink-0">
                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Racha</div>
                 <div className="text-xl md:text-2xl font-black text-amber-500 flex items-center justify-center gap-1 leading-none">
-                  🔥 {stats.currentStreak}
+                  <Icons.Flame className="w-5 h-5" /> {stats.currentStreak}
                 </div>
               </div>
             </div>
@@ -261,22 +262,22 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           <div className="flex gap-1 bg-slate-100 p-1 shrink-0">
             <button 
               onClick={() => setViewMode("BOARD")}
-              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "BOARD" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 flex items-center gap-1 ${viewMode === "BOARD" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
-              📋 Tablero
+              <Icons.Clipboard className="w-4 h-4" /> Tablero
             </button>
             <button 
               onClick={() => setViewMode("TODAY")}
-              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === "TODAY" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 flex items-center gap-1 ${viewMode === "TODAY" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
-              📅 Agenda
+              <Icons.Calendar className="w-4 h-4" /> Agenda
             </button>
             <Link 
               href="/tasks/recurring"
               className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors text-slate-500 hover:text-slate-700 flex items-center gap-1"
               title="Rutinas / Tareas Recurrentes"
             >
-              🔁 <span className="hidden sm:inline">Rutinas</span>
+              <Icons.Repeat className="w-4 h-4" /> <span className="hidden sm:inline">Rutinas</span>
             </Link>
           </div>
 
@@ -290,7 +291,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   className="w-3 h-3 accent-indigo-600"
                 />
                 <span className="hidden sm:inline">Ocultar completadas</span>
-                <span className="sm:hidden">Ocultar ✓</span>
+                <span className="sm:hidden">Ocultar</span>
               </label>
             )}
 
@@ -298,7 +299,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               <select
                 value={taskFilter}
                 onChange={(e) => setTaskFilter(e.target.value as any)}
-                className="w-full bg-white border border-slate-300 text-xs px-2 py-1.5 outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full bg-white border border-slate-300 text-xs px-2 py-1.5 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="ALL">Todas las tareas</option>
                 <option value="CREATED">Creadas por mí</option>
@@ -325,14 +326,14 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               {overdueTasks.length > 0 && (
                 <section>
                   <h3 className="text-sm font-black text-amber-700 uppercase tracking-wider mb-4 border-b border-amber-200 pb-2 flex items-center gap-2 bg-amber-50 p-2">
-                    ⚠ Pendientes ({overdueTasks.length})
+                    <Icons.AlertTriangle className="w-4 h-4" /> Pendientes ({overdueTasks.length})
                   </h3>
                   <div className="space-y-3">
                     {overdueTasks.slice(0, 5).map(task => (
                       <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-amber-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
                         <div className="flex items-center gap-3">
                           <button 
-                            className="w-8 h-8 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
+                            className="w-10 h-10 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
@@ -378,12 +379,12 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                         <div key={task.id} onClick={() => handleTaskClick(task)} className={`bg-white border-l-4 ${isDone ? 'border-l-emerald-400 opacity-60' : 'border-l-indigo-500'} border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group`}>
                           <div className="flex items-center gap-3">
                             {isDone ? (
-                              <div className="w-8 h-8 rounded-none bg-emerald-100 border-2 border-emerald-400 shrink-0 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-none bg-emerald-100 border-2 border-emerald-400 shrink-0 flex items-center justify-center">
                                 <span className="text-emerald-600 text-sm">✓</span>
                               </div>
                             ) : (
                               <button 
-                                className="w-8 h-8 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center"
+                                className="w-10 h-10 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDragEnd({ active: { id: task.id }, over: { id: "DONE" } } as any);
@@ -393,9 +394,9 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                             <div>
                               <h4 className={`font-bold ${isDone ? 'line-through text-slate-400' : 'text-slate-900 group-hover:text-indigo-600'} transition-colors line-clamp-1`}>{task.title}</h4>
                               <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
-                                {task.dueTime ? <span>🕒 {task.dueTime}</span> : <span>Todo el día</span>}
+                                {task.dueTime ? <span className="flex items-center gap-0.5"><Icons.Clock className="w-3.5 h-3.5 inline" /> {task.dueTime}</span> : <span>Todo el día</span>}
                                 {task.categoryId && <span>• {categories.find((c:any) => c.id === task.categoryId)?.name}</span>}
-                                {task.recurrenceRule && <span>• 🔁</span>}
+                                {task.recurrenceRule && <span className="flex items-center gap-0.5">• <Icons.Repeat className="w-3.5 h-3.5 inline" /></span>}
                                 {isDone && <span className="text-emerald-600">✓ Completada</span>}
                               </div>
                             </div>
@@ -417,7 +418,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   <div className="space-y-2">
                     {upcomingSubtasks.map(({subtask, parentTask}) => (
                       <div key={subtask.id} onClick={() => handleTaskClick(parentTask)} className="bg-slate-50 border border-slate-200 p-3 cursor-pointer hover:bg-slate-100 transition-colors flex items-center gap-3 group">
-                        <span className="text-indigo-400">📌</span>
+                        <span className="text-indigo-400"><Icons.Pin className="w-4 h-4" /></span>
                         <div>
                           <h4 className="font-medium text-sm text-slate-800 line-clamp-1">{subtask.title}</h4>
                           <span className="text-[10px] text-slate-500">De: {parentTask.title}</span>
@@ -542,7 +543,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider ${activeTab === "RUTINA" ? "bg-white shadow-sm text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"}`}
               onClick={() => setActiveTab("RUTINA")}
             >
-              Recurrencia {isRecurring && "✅"}
+              Recurrencia {isRecurring && <Icons.Check className="w-4 h-4 inline text-emerald-500" />}
             </button>
           </div>
 
@@ -610,7 +611,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                         {subtasks.map((st, i) => (
                           <div key={i} className="flex justify-between items-center text-sm bg-white p-3 border border-slate-200 shadow-sm group">
                             <span className="font-medium text-slate-700">{st.title}</span>
-                            <button type="button" onClick={() => setSubtasks(subtasks.filter((_, idx) => idx !== i))} className="text-slate-300 hover:text-red-500 transition-colors">✕</button>
+                            <button type="button" onClick={() => setSubtasks(subtasks.filter((_, idx) => idx !== i))} className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors cursor-pointer" aria-label="Eliminar microtarea"><Icons.X className="w-4 h-4" /></button>
                           </div>
                         ))}
                       </div>
