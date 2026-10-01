@@ -88,9 +88,25 @@ export async function createTask(formData: FormData) {
   const categoryId = formData.get("categoryId") as string
   const dueDateStr = formData.get("dueDate") as string
   const dueTime = formData.get("dueTime") as string
+  const assignedToRaw = formData.get("assignedTo") as string
 
   if (!title) {
     throw new Error("Title is required")
+  }
+
+  let assignedTo = userId
+  if (assignedToRaw && assignedToRaw !== userId) {
+    const targetMember = await prisma.tenantUser.findUnique({
+      where: {
+        tenantId_userId: {
+          tenantId: currentTenantId,
+          userId: assignedToRaw
+        }
+      }
+    })
+    if (targetMember) {
+      assignedTo = assignedToRaw
+    }
   }
 
   const task = await prisma.task.create({
@@ -101,20 +117,38 @@ export async function createTask(formData: FormData) {
       status: "TODO",
       tenantId: currentTenantId,
       createdByUserId: userId,
-      assignedTo: userId, // Default assign to creator
+      assignedTo,
       categoryId: categoryId || null,
       dueDate: dueDateStr ? new Date(dueDateStr) : null,
       dueTime: dueTime || null,
     }
   })
 
-  // Enviar Push Notification solo si se asigna a otro usuario
+  // Enviar Notificación Push e In-App si se asigna a otro usuario
   if (task.assignedTo && task.assignedTo !== userId) {
+    const creator = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true }
+    })
+    const creatorName = creator?.name || "Un compañero"
+
+    await prisma.notification.create({
+      data: {
+        userId: task.assignedTo,
+        organizationId: currentTenantId,
+        type: "TASK_DUE_SOON",
+        title: "📌 Nueva Tarea Asignada",
+        body: `${creatorName} te asignó: ${task.title}`,
+        link: "/tasks"
+      }
+    }).catch(console.error)
+
     await sendPushToUser(task.assignedTo, {
-      title: "Nueva Tarea Asignada", 
-      body: task.title, 
-      link: "/tasks"
-    });
+      title: "📌 Nueva Tarea Asignada", 
+      body: `${creatorName} te asignó: ${task.title}`, 
+      link: "/tasks",
+      soundType: "default"
+    }).catch(console.error)
   }
 
   revalidatePath("/tasks")
@@ -330,11 +364,12 @@ export async function getUserStats() {
   return stats
 }
 
-export async function updateTask(taskId: string, data: { title?: string; description?: string; categoryId?: string; points?: number; dueDate?: string; dueTime?: string; status?: TaskStatus }) {
+export async function updateTask(taskId: string, data: { title?: string; description?: string; categoryId?: string; points?: number; dueDate?: string; dueTime?: string; status?: TaskStatus; assignedTo?: string }) {
   const session = await auth()
   if (!session?.user) throw new Error("Unauthorized")
 
   const currentTenantId = (session.user as any).selectedTenantId
+  const currentUserId = session.user.id as string
   if (!currentTenantId) throw new Error("No organization selected")
 
   const task = await prisma.task.findUnique({ where: { id: taskId } })
@@ -355,6 +390,48 @@ export async function updateTask(taskId: string, data: { title?: string; descrip
   }
   if (updateData.categoryId === "") {
     updateData.categoryId = null;
+  }
+
+  // Si cambia el usuario asignado
+  if (data.assignedTo && data.assignedTo !== task.assignedTo) {
+    const targetMember = await prisma.tenantUser.findUnique({
+      where: {
+        tenantId_userId: {
+          tenantId: currentTenantId,
+          userId: data.assignedTo
+        }
+      }
+    });
+
+    if (targetMember) {
+      if (data.assignedTo !== currentUserId) {
+        const actor = await prisma.user.findUnique({
+          where: { id: currentUserId },
+          select: { name: true }
+        });
+        const actorName = actor?.name || "Un compañero";
+
+        await prisma.notification.create({
+          data: {
+            userId: data.assignedTo,
+            organizationId: currentTenantId,
+            type: "TASK_DUE_SOON",
+            title: "📌 Nueva Tarea Asignada",
+            body: `${actorName} te asignó: ${data.title || task.title}`,
+            link: "/tasks"
+          }
+        }).catch(console.error);
+
+        await sendPushToUser(data.assignedTo, {
+          title: "📌 Nueva Tarea Asignada",
+          body: `${actorName} te asignó: ${data.title || task.title}`,
+          link: "/tasks",
+          soundType: "default"
+        }).catch(console.error);
+      }
+    } else {
+      delete updateData.assignedTo;
+    }
   }
 
   if (Object.keys(updateData).length > 0) {
@@ -504,9 +581,38 @@ export async function assignTaskCollaborators(taskId: string, userIds: string[])
         userId: userId
       }))
     });
+
+    const actor = await prisma.user.findUnique({
+      where: { id: currentUserId },
+      select: { name: true }
+    });
+    const actorName = actor?.name || "Un compañero";
+
+    for (const newUserId of toAdd) {
+      if (newUserId !== currentUserId) {
+        await prisma.notification.create({
+          data: {
+            userId: newUserId,
+            organizationId: currentTenantId,
+            type: "TASK_DUE_SOON",
+            title: "👥 Asignado como Colaborador",
+            body: `${actorName} te añadió como colaborador en: ${task.title}`,
+            link: "/tasks"
+          }
+        }).catch(console.error);
+
+        await sendPushToUser(newUserId, {
+          title: "👥 Asignado como Colaborador",
+          body: `${actorName} te añadió como colaborador en: ${task.title}`,
+          link: "/tasks",
+          soundType: "default"
+        }).catch(console.error);
+      }
+    }
   }
 
   revalidatePath("/tasks");
+  revalidatePath("/dashboard");
 }
 
 export async function assignSubtask(subtaskId: string, userId: string | null) {

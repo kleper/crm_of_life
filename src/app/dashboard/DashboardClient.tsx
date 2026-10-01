@@ -14,7 +14,7 @@ import { Toast } from "@/components/ui/Toast";
 import { getKudoOptions } from "@/lib/kudos";
 import { formatCurrency } from "@/lib/currency";
 import Icons from "@/components/ui/Icons";
-import { createTask } from "@/features/tasks/actions";
+import { createTask, updateTaskStatus } from "@/features/tasks/actions";
 import { createTransaction } from "@/features/finance/actions";
 import { logInteraction } from "@/features/contacts/actions";
 
@@ -85,6 +85,32 @@ interface DashboardClientProps {
   currency: string;
   taskCategories?: Array<{ id: string; name: string }>;
   financeCategories?: Array<{ id: string; name: string; type: string }>;
+  assignedTasks?: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    points: number;
+    status: string;
+    dueDate: string | null;
+    dueTime: string | null;
+    categoryId: string | null;
+    categoryName: string | null;
+    categoryColor: string | null;
+    assignedTo: string | null;
+    isCreatedByMe: boolean;
+    creatorName: string;
+    creatorImage: string | null;
+    totalSubtasks: number;
+    completedSubtasks: number;
+  }>;
+  tenantMembers?: Array<{
+    id: string;
+    name: string;
+    email: string | null;
+    image: string | null;
+    role: string;
+  }>;
+  currentUserId?: string;
 }
 
 export default function DashboardClient({
@@ -101,7 +127,10 @@ export default function DashboardClient({
   publicKudoWall,
   currency,
   taskCategories = [],
-  financeCategories = []
+  financeCategories = [],
+  assignedTasks = [],
+  tenantMembers = [],
+  currentUserId = ""
 }: DashboardClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -134,6 +163,64 @@ export default function DashboardClient({
   const showFeedback = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // State for completing a task from the dashboard
+  const [completingTaskId, setCompletingTaskId] = useState<string | null>(null);
+
+  const handleCompleteTask = async (taskId: string) => {
+    setCompletingTaskId(taskId);
+    try {
+      const res = await updateTaskStatus(taskId, "DONE");
+      showFeedback(`✓ Tarea completada ${res ? `(+${res.pointsEarned} pts)` : ""}`);
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch (err: any) {
+      showFeedback("Error al completar la tarea");
+    } finally {
+      setCompletingTaskId(null);
+    }
+  };
+
+  const formatTaskDueDate = (dueDateStr: string | null) => {
+    if (!dueDateStr) return null;
+    const targetDate = new Date(dueDateStr);
+    const now = new Date();
+
+    const targetDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
+    const todayDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    const diffDays = Math.round((targetDay - todayDay) / oneDay);
+
+    if (diffDays < 0) {
+      return {
+        label: `Vencida (${Math.abs(diffDays)}d)`,
+        badgeClass: "bg-red-100 text-red-800 border-red-200"
+      };
+    }
+    if (diffDays === 0) {
+      return {
+        label: "Hoy",
+        badgeClass: "bg-amber-100 text-amber-900 border-amber-200"
+      };
+    }
+    if (diffDays === 1) {
+      return {
+        label: "Mañana",
+        badgeClass: "bg-indigo-50 text-indigo-700 border-indigo-200"
+      };
+    }
+
+    const formatted = targetDate.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short"
+    });
+    return {
+      label: formatted,
+      badgeClass: "bg-slate-100 text-slate-700 border-slate-200"
+    };
   };
 
   // 1-Click Quick Contact Check-in
@@ -436,7 +523,124 @@ export default function DashboardClient({
               </div>
             </Card>
 
-            {/* 3-4. Weekly Productivity & Categories */}
+            {/* 3. Tareas Asignadas y Pendientes (Cockpit Directo) */}
+            <Card className="flex flex-col !p-4 md:!p-6 border border-slate-200 rounded-none bg-white">
+              <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-900">Tareas Asignadas y Pendientes</h2>
+                  {assignedTasks.length > 0 && (
+                    <span className="bg-slate-900 text-white text-xs font-bold px-2 py-0.5">
+                      {assignedTasks.length}
+                    </span>
+                  )}
+                </div>
+                <Link
+                  href="/tasks"
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-wider"
+                >
+                  Ver Tablero
+                </Link>
+              </div>
+
+              {assignedTasks.length === 0 ? (
+                <div className="flex items-center justify-center py-6">
+                  <EmptyState
+                    title="Al Día con tus Tareas"
+                    description="No tienes tareas pendientes asignadas. Crea una nueva o revisa el tablero general."
+                    actionLabel="Crear Tarea"
+                    onAction={() => setIsTaskModalOpen(true)}
+                    className="border-none shadow-none bg-transparent py-2"
+                    icon={<Icons.CheckSquare className="w-8 h-8 text-emerald-600" />}
+                  />
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {assignedTasks.map((t) => {
+                    const dateInfo = formatTaskDueDate(t.dueDate);
+                    const isCompleting = completingTaskId === t.id;
+
+                    return (
+                      <div
+                        key={t.id}
+                        className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group hover:bg-slate-50 transition-colors -mx-2 px-2"
+                      >
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <button
+                            type="button"
+                            onClick={() => handleCompleteTask(t.id)}
+                            disabled={isCompleting}
+                            title="Completar tarea"
+                            aria-label={`Completar tarea: ${t.title}`}
+                            className="mt-0.5 w-5 h-5 min-w-[20px] min-h-[20px] border border-slate-300 rounded-none bg-white hover:border-emerald-500 hover:bg-emerald-50 flex items-center justify-center text-emerald-600 transition-colors cursor-pointer"
+                          >
+                            {isCompleting ? (
+                              <span className="w-2.5 h-2.5 border-2 border-slate-400 border-t-transparent animate-spin inline-block" />
+                            ) : null}
+                          </button>
+
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <span className="text-sm font-bold text-slate-800 truncate">
+                              {t.title}
+                            </span>
+
+                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 border border-amber-200">
+                                +{t.points} pts
+                              </span>
+
+                              {t.categoryName && (
+                                <span className="text-xs font-medium text-slate-600 flex items-center gap-1">
+                                  <span
+                                    className={`w-2 h-2 shrink-0 ${t.categoryColor || "bg-slate-400"}`}
+                                  />
+                                  <span>{t.categoryName}</span>
+                                </span>
+                              )}
+
+                              {t.totalSubtasks > 0 && (
+                                <span className="text-xs font-medium text-slate-500">
+                                  {t.completedSubtasks}/{t.totalSubtasks} microtareas
+                                </span>
+                              )}
+
+                              {!t.isCreatedByMe && (
+                                <span className="text-xs font-medium text-slate-500 italic">
+                                  Por: {t.creatorName}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Due Date & Time Badge */}
+                        <div className="flex items-center gap-2 self-start sm:self-center pl-8 sm:pl-0">
+                          {dateInfo ? (
+                            <span
+                              className={`text-xs font-bold px-2 py-0.5 border uppercase tracking-wider ${dateInfo.badgeClass}`}
+                            >
+                              {dateInfo.label}
+                            </span>
+                          ) : (
+                            <span className="text-xs font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5">
+                              Sin fecha
+                            </span>
+                          )}
+
+                          {t.dueTime && (
+                            <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
+                              <Icons.Clock className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{t.dueTime}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            {/* 4-5. Weekly Productivity & Categories */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               
               {/* Weekly Bar Chart (Accessible Labels for Mobile) */}
@@ -935,13 +1139,16 @@ export default function DashboardClient({
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input
-              label="Puntos de Gamificación"
-              name="points"
-              type="number"
-              defaultValue="10"
-              min="1"
-              max="100"
+            <Select
+              label="Asignar a"
+              name="assignedTo"
+              defaultValue={currentUserId}
+              options={[
+                { value: currentUserId, label: "A mí (Responsable)" },
+                ...tenantMembers
+                  .filter(m => m.id !== currentUserId)
+                  .map(m => ({ value: m.id, label: m.name }))
+              ]}
             />
 
             <Select
@@ -954,7 +1161,15 @@ export default function DashboardClient({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Input
+              label="Puntos"
+              name="points"
+              type="number"
+              defaultValue="10"
+              min="1"
+              max="100"
+            />
             <Input
               label="Fecha Límite"
               name="dueDate"

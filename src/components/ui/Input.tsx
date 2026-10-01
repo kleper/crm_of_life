@@ -18,7 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           aria-describedby={errorId}
           aria-invalid={error ? true : undefined}
-          className={`w-full bg-white border border-slate-300 px-3 py-2.5 min-h-[44px] text-slate-900 rounded-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow ${
+          className={`w-full bg-white border border-slate-300 px-3 py-2.5 min-h-[44px] text-base sm:text-sm text-slate-900 rounded-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow ${
             error ? "border-red-500 focus:ring-red-500" : ""
           } ${className}`}
           {...props}
@@ -49,7 +49,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           aria-describedby={errorId}
           aria-invalid={error ? true : undefined}
-          className={`w-full bg-white border border-slate-300 px-3 py-2.5 min-h-[44px] text-slate-900 rounded-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow ${
+          className={`w-full bg-white border border-slate-300 px-3 py-2.5 min-h-[44px] text-base sm:text-sm text-slate-900 rounded-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow ${
             error ? "border-red-500 focus:ring-red-500" : ""
           } ${className}`}
           {...props}

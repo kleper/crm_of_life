@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useOptimistic, useTransition } from "react";
+import { useState, useOptimistic, useTransition, useCallback } from "react";
 import { DndContext, DragEndEvent, pointerWithin, useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import { TaskStatus } from "@prisma/client";
 import { updateTaskStatus, createTask, GamificationResult } from "@/features/tasks/actions";
@@ -57,6 +57,13 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
   const [rruleStr, setRruleStr] = useState("");
   const [subtasks, setSubtasks] = useState<{title: string, order: number}[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+
+  const handleCloseSheet = useCallback(() => {
+    setIsSheetOpen(false);
+    setIsRecurring(false);
+    setSubtasks([]);
+    setActiveTab("DETALLES");
+  }, []);
 
   const todayStr = new Date().toLocaleString("sv-SE", { timeZone: "America/Bogota" }).split(' ')[0]; // Basic fallback, ideally use tenant timezone
 
@@ -233,12 +240,12 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           {stats && (
             <div className="relative z-10 flex gap-4 md:gap-6 items-center overflow-x-auto pb-2 md:pb-0 scrollbar-hide bg-slate-50/50 p-3 md:p-4 border border-slate-100 min-w-0">
               <div className="text-center shrink-0">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Nivel</div>
-                <div className="text-2xl md:text-3xl font-black text-indigo-600 leading-none">{stats.currentLevel}</div>
+                <div className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Nivel</div>
+                <div className="text-2xl md:text-3xl font-black text-slate-900 leading-none">{stats.currentLevel}</div>
               </div>
               
               <div className="w-[120px] md:w-[200px] shrink-0">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 mb-2">
+                <div className="flex justify-between text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
                   <span className="text-indigo-600 truncate">{stats.totalPoints} pts</span>
                   <span className="truncate">Meta: {Math.pow(stats.currentLevel, 2) * 100}</span>
                 </div>
@@ -248,7 +255,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               </div>
 
               <div className="text-center border-l border-slate-200 pl-4 md:pl-6 shrink-0">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Racha</div>
+                <div className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Racha</div>
                 <div className="text-xl md:text-2xl font-black text-amber-500 flex items-center justify-center gap-1 leading-none">
                   <Icons.Flame className="w-5 h-5" /> {stats.currentStreak}
                 </div>
@@ -262,19 +269,19 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           <div className="flex gap-1 bg-slate-100 p-1 shrink-0">
             <button 
               onClick={() => setViewMode("BOARD")}
-              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 flex items-center gap-1 ${viewMode === "BOARD" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 flex items-center gap-1.5 ${viewMode === "BOARD" ? "bg-white border border-slate-200 text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
               <Icons.Clipboard className="w-4 h-4" /> Tablero
             </button>
             <button 
               onClick={() => setViewMode("TODAY")}
-              className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 flex items-center gap-1 ${viewMode === "TODAY" ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 flex items-center gap-1.5 ${viewMode === "TODAY" ? "bg-white border border-slate-200 text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
             >
               <Icons.Calendar className="w-4 h-4" /> Agenda
             </button>
             <Link 
               href="/tasks/recurring"
-              className="px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors text-slate-500 hover:text-slate-700 flex items-center gap-1"
+              className="px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-wider transition-colors text-slate-500 hover:text-slate-700 flex items-center gap-1.5"
               title="Rutinas / Tareas Recurrentes"
             >
               <Icons.Repeat className="w-4 h-4" /> <span className="hidden sm:inline">Rutinas</span>
@@ -283,7 +290,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
 
           <div className="flex items-center gap-2 shrink-0">
             {viewMode === "BOARD" && (
-              <label className="flex items-center gap-1 text-[10px] sm:text-xs font-bold text-slate-600 cursor-pointer whitespace-nowrap">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-slate-600 cursor-pointer whitespace-nowrap min-h-[44px] py-1">
                 <input 
                   type="checkbox" 
                   checked={hideCompleted} 
@@ -330,7 +337,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   </h3>
                   <div className="space-y-3">
                     {overdueTasks.slice(0, 5).map(task => (
-                      <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border-l-4 border-l-amber-500 border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
+                      <div key={task.id} onClick={() => handleTaskClick(task)} className="bg-white border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group">
                         <div className="flex items-center gap-3">
                           <button 
                             className="w-10 h-10 rounded-none border-2 border-slate-300 hover:border-indigo-500 transition-colors shrink-0 flex items-center justify-center cursor-pointer"
@@ -341,13 +348,13 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                           />
                           <div>
                             <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{task.title}</h4>
-                            <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
+                            <div className="flex gap-2 text-xs text-slate-500 mt-1 font-medium">
                               <span className="text-amber-600">{new Date(task.dueDate).toLocaleDateString()}</span>
                               {task.dueTime && <span>• {task.dueTime}</span>}
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>
+                        <span className="text-xs font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>
                       </div>
                     ))}
                     {overdueTasks.length > 5 && (
@@ -363,7 +370,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               <section>
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
                   <span>Hoy — {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-                  <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5">{pendingTodayCount}/{sortedTodayTasks.length}</span>
+                  <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5">{pendingTodayCount}/{sortedTodayTasks.length}</span>
                 </h3>
                 {sortedTodayTasks.length === 0 ? (
                   <div className="text-center py-12 bg-white border border-dashed border-slate-300">
@@ -376,7 +383,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                     {sortedTodayTasks.map(task => {
                       const isDone = task.status === 'DONE';
                       return (
-                        <div key={task.id} onClick={() => handleTaskClick(task)} className={`bg-white border-l-4 ${isDone ? 'border-l-emerald-400 opacity-60' : 'border-l-indigo-500'} border-t border-r border-b border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group`}>
+                        <div key={task.id} onClick={() => handleTaskClick(task)} className={`bg-white border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group ${isDone ? 'opacity-60 bg-slate-50/50' : ''}`}>
                           <div className="flex items-center gap-3">
                             {isDone ? (
                               <div className="w-10 h-10 rounded-none bg-emerald-100 border-2 border-emerald-400 shrink-0 flex items-center justify-center">
@@ -393,7 +400,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                             )}
                             <div>
                               <h4 className={`font-bold ${isDone ? 'line-through text-slate-400' : 'text-slate-900 group-hover:text-indigo-600'} transition-colors line-clamp-1`}>{task.title}</h4>
-                              <div className="flex gap-2 text-[10px] sm:text-xs text-slate-500 mt-1 font-medium">
+                              <div className="flex gap-2 text-xs text-slate-500 mt-1 font-medium">
                                 {task.dueTime ? <span className="flex items-center gap-0.5"><Icons.Clock className="w-3.5 h-3.5 inline" /> {task.dueTime}</span> : <span>Todo el día</span>}
                                 {task.categoryId && <span>• {categories.find((c:any) => c.id === task.categoryId)?.name}</span>}
                                 {task.recurrenceRule && <span className="flex items-center gap-0.5">• <Icons.Repeat className="w-3.5 h-3.5 inline" /></span>}
@@ -401,7 +408,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                               </div>
                             </div>
                           </div>
-                          {!isDone && <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>}
+                          {!isDone && <span className="text-xs font-black text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 shrink-0">+{task.points}</span>}
                         </div>
                       );
                     })}
@@ -421,7 +428,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                         <span className="text-indigo-400"><Icons.Pin className="w-4 h-4" /></span>
                         <div>
                           <h4 className="font-medium text-sm text-slate-800 line-clamp-1">{subtask.title}</h4>
-                          <span className="text-[10px] text-slate-500">De: {parentTask.title}</span>
+                          <span className="text-xs text-slate-500">De: {parentTask.title}</span>
                         </div>
                       </div>
                     ))}
@@ -463,12 +470,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
       </div>
 
       {/* New Task Sheet */}
-      <Sheet isOpen={isSheetOpen} onClose={() => {
-        setIsSheetOpen(false);
-        setIsRecurring(false);
-        setSubtasks([]);
-        setActiveTab("DETALLES");
-      }} title="Crear Tarea">
+      <Sheet isOpen={isSheetOpen} onClose={handleCloseSheet} title="Crear Tarea">
         <form action={async (formData) => {
           if (isRecurring && rruleStr) {
             startTransition(async () => {
@@ -496,6 +498,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               title: formData.get("title") as string,
               description: formData.get("description") as string,
               categoryId: formData.get("categoryId") as string,
+              assignedTo: (formData.get("assignedTo") as string) || currentUserId,
               points: parseInt(formData.get("points") as string || "10", 10),
               dueDate: formData.get("dueDate") as string,
               dueTime: formData.get("dueTime") as string,
@@ -507,6 +510,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
               id: "temp-" + Date.now(),
               ...payload,
               status: "TODO" as any,
+              assignedTo: payload.assignedTo,
               dueDate: payload.dueDate ? new Date(payload.dueDate) : null,
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -533,21 +537,21 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
           <div className="flex border-b border-slate-200 mb-6 bg-slate-50 p-1">
             <button 
               type="button"
-              className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider ${activeTab === "DETALLES" ? "bg-white shadow-sm text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"}`}
+              className={`flex-1 py-2 min-h-[44px] text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === "DETALLES" ? "bg-white text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"}`}
               onClick={() => setActiveTab("DETALLES")}
             >
               Detalles
             </button>
             <button 
               type="button"
-              className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider ${activeTab === "RUTINA" ? "bg-white shadow-sm text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"}`}
+              className={`flex-1 py-2 min-h-[44px] text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === "RUTINA" ? "bg-white text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"}`}
               onClick={() => setActiveTab("RUTINA")}
             >
               Recurrencia {isRecurring && <Icons.Check className="w-4 h-4 inline text-emerald-500" />}
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-2 pb-24">
+          <div className="flex-1 overflow-y-auto pr-2 pb-36">
             {/* CRITICAL: Use hidden instead of conditional rendering so that
                 form inputs (title, description, etc.) are always in the DOM.
                 Otherwise formData.get("title") returns null when submitting
@@ -561,7 +565,21 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                   <textarea name="description" className="w-full border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none min-h-[100px] resize-y rounded-none transition-all"></textarea>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select 
+                    label="Asignar a" 
+                    name="assignedTo" 
+                    defaultValue={currentUserId}
+                    options={[
+                      { value: currentUserId, label: "A mí (Responsable)" },
+                      ...tenantUsers
+                        .filter((tu: any) => tu.user.id !== currentUserId)
+                        .map((tu: any) => ({
+                          value: tu.user.id,
+                          label: `${tu.user.name || "Usuario del equipo"}`
+                        }))
+                    ]} 
+                  />
                   <Select 
                     label="Categoría" 
                     name="categoryId" 
@@ -570,8 +588,9 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                       ...categories.map(c => ({ value: c.id, label: c.name }))
                     ]} 
                   />
-                  <Input label="Puntos" type="number" name="points" defaultValue={10} min={1} max={100} required />
                 </div>
+
+                <Input label="Puntos" type="number" name="points" defaultValue={10} min={1} max={100} required />
 
                 <div className="bg-slate-50 border border-slate-200 p-4 space-y-4">
                   <h3 className="text-xs font-black text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-2">Cuándo</h3>
@@ -579,7 +598,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                     <Input label="Fecha Límite" type="date" name="dueDate" disabled={isRecurring} />
                     <Input label="Hora (Opcional)" type="time" name="dueTime" />
                   </div>
-                  {isRecurring && <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2 border border-amber-200">La fecha base se maneja desde la pestaña Recurrencia.</p>}
+                  {isRecurring && <p className="text-xs text-amber-800 font-bold bg-amber-50 p-2 border border-amber-200">La fecha base se maneja desde la pestaña Recurrencia.</p>}
                 </div>
               </div>
             </div>
@@ -609,7 +628,7 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
                       
                       <div className="flex flex-col gap-2">
                         {subtasks.map((st, i) => (
-                          <div key={i} className="flex justify-between items-center text-sm bg-white p-3 border border-slate-200 shadow-sm group">
+                          <div key={i} className="flex justify-between items-center text-sm bg-white p-3 border border-slate-200 group">
                             <span className="font-medium text-slate-700">{st.title}</span>
                             <button type="button" onClick={() => setSubtasks(subtasks.filter((_, idx) => idx !== i))} className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors cursor-pointer" aria-label="Eliminar microtarea"><Icons.X className="w-4 h-4" /></button>
                           </div>
@@ -651,12 +670,8 @@ export default function TasksClient({ initialTasks, initialStats, categories, te
             </div>
           </div>
           
-          <div className="absolute bottom-0 left-0 w-full bg-slate-50 border-t border-slate-200 p-4 sm:p-6 flex justify-end gap-3 z-20">
-            <Button type="button" variant="ghost" onClick={() => {
-              setIsSheetOpen(false);
-              setIsRecurring(false);
-              setSubtasks([]);
-            }}>Cancelar</Button>
+          <div className="sticky bottom-0 left-0 w-full bg-slate-50 border-t border-slate-200 p-4 sm:p-6 flex justify-end gap-3 z-20 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <Button type="button" variant="ghost" onClick={handleCloseSheet}>Cancelar</Button>
             <Button type="submit" variant="primary" disabled={isPending}>Guardar Tarea</Button>
           </div>
         </form>

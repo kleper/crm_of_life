@@ -29,22 +29,33 @@ export function Sheet({ isOpen, onClose, title, children }: SheetProps) {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
-  // Escape key handler
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
   }, [onClose]);
 
+  // Escape key handler
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      sheetRef.current?.focus();
-    }
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCloseRef.current();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen]);
+
+  // Focus container only once on mount/open if focus is not already inside a child element
+  useEffect(() => {
+    if (isOpen) {
+      if (!sheetRef.current?.contains(document.activeElement)) {
+        sheetRef.current?.focus();
+      }
+    }
+  }, [isOpen]);
 
   if (!isOpen || !mounted) return null;
 
@@ -63,7 +74,7 @@ export function Sheet({ isOpen, onClose, title, children }: SheetProps) {
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="relative z-10 w-full sm:w-[480px] bg-white h-[90vh] sm:h-full flex flex-col transform transition-transform sm:border-l border-slate-200 shadow-2xl rounded-none"
+        className="relative z-10 w-full sm:w-[480px] bg-white h-[100dvh] sm:h-full max-h-[100dvh] flex flex-col transform transition-transform sm:border-l border-slate-200 shadow-2xl rounded-none"
       >
         <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50">
           <h2 id={titleId} className="text-xl font-black text-slate-900 uppercase tracking-tight">{title}</h2>

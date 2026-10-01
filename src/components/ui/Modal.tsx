@@ -25,23 +25,33 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
     };
   }, [isOpen]);
 
-  // Escape key handler
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      onClose();
-    }
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
   }, [onClose]);
 
+  // Escape key handler
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      // Focus the dialog on open for screen readers
-      dialogRef.current?.focus();
-    }
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onCloseRef.current();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen]);
+
+  // Focus the dialog on open only once, never stealing focus from child inputs
+  useEffect(() => {
+    if (isOpen) {
+      if (!dialogRef.current?.contains(document.activeElement)) {
+        dialogRef.current?.focus();
+      }
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -59,7 +69,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
     >
       <div 
         ref={dialogRef}
-        className={`bg-white rounded-none shadow-2xl w-full ${maxWidths[maxWidth]} flex flex-col max-h-[90vh]`}
+        className={`bg-white rounded-none shadow-2xl w-full ${maxWidths[maxWidth]} flex flex-col max-h-[90dvh]`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

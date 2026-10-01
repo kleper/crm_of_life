@@ -382,3 +382,69 @@ export async function getOrgCollaborationStats(organizationId: string) {
 
   return results;
 }
+
+export async function getAssignedPendingTasks(userId: string, organizationId: string, limit = 10) {
+  const tasks = await prisma.task.findMany({
+    where: {
+      tenantId: organizationId,
+      status: { not: "DONE" },
+      OR: [
+        { assignedTo: userId },
+        { collaborators: { some: { userId } } }
+      ]
+    },
+    include: {
+      category: true,
+      creator: {
+        select: { id: true, name: true, image: true }
+      },
+      subtasks: {
+        select: { id: true, completed: true }
+      }
+    },
+    orderBy: [
+      { dueDate: "asc" },
+      { createdAt: "desc" }
+    ],
+    take: limit
+  });
+
+  return tasks.map(t => ({
+    id: t.id,
+    title: t.title,
+    description: t.description,
+    points: t.points,
+    status: t.status,
+    dueDate: t.dueDate ? t.dueDate.toISOString() : null,
+    dueTime: t.dueTime,
+    categoryId: t.categoryId,
+    categoryName: t.category?.name || null,
+    categoryColor: t.category?.color || null,
+    assignedTo: t.assignedTo,
+    isCreatedByMe: t.createdByUserId === userId,
+    creatorName: t.creator?.name || "Compañero",
+    creatorImage: t.creator?.image || null,
+    totalSubtasks: t.subtasks.length,
+    completedSubtasks: t.subtasks.filter(st => st.completed).length
+  }));
+}
+
+export async function getTenantMembers(organizationId: string) {
+  const tenantUsers = await prisma.tenantUser.findMany({
+    where: { tenantId: organizationId },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true, image: true }
+      }
+    }
+  });
+
+  return tenantUsers.map(tu => ({
+    id: tu.user.id,
+    name: tu.user.name || tu.user.email || "Usuario",
+    email: tu.user.email,
+    image: tu.user.image,
+    role: tu.role
+  }));
+}
+

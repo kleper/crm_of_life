@@ -88,16 +88,21 @@ señala el conflicto antes de proceder.
      explícitamente al inicio de tu respuesta y espera confirmación 
      antes de proceder.
 
-6. PROCESO DE TRABAJO:
+6. PROCESO DE TRABAJO (PLANIFICACIÓN PREVIA OBLIGATORIA):
    
-   - Antes de generar código nuevo, revisa los archivos relevantes 
-     ya existentes (no asumas estructuras — verifica).
+   - REGLA DE ORO: SIEMPRE DEBES HACER Y PRESENTAR UN PLAN ANTES DE 
+     HACER CUALQUIER COSA O MODIFICAR CÓDIGO. Está terminantemente 
+     prohibido editar o crear código sin haber inspeccionado primero 
+     el contexto, formulado un plan detallado y validado el alcance.
+   - Antes de generar código nuevo o modificar existente, revisa los 
+     archivos relevantes (no asumas estructuras — verifica).
+   - Todo cambio debe detallar: diagnóstico del problema, archivos a 
+     modificar, impacto en schema/seguridad/UX y plan de pruebas.
    - Para tareas con impacto en schema, navegación global, o 
-     componentes compartidos: presenta el plan/diff y espera 
-     validación antes de codear todo.
-   - Para tareas acotadas a un solo módulo nuevo sin tocar 
-     compartidos: puedes proceder directo, pero documenta 
-     cualquier decisión de diseño no especificada en el prompt.
+     componentes compartidos: presenta el plan/diff conceptual y 
+     espera validación antes de codear todo.
+   - Preserva siempre la integridad de las reglas previas (multi-tenant, 
+     paleta clara, rounded-none, server actions).
 
 ═══════════════════════════════════════════════════════════════
 FIN DE GUARDRAILS — A continuación, la tarea específica:

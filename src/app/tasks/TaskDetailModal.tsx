@@ -19,7 +19,7 @@ import Icons from "@/components/ui/Icons";
 
 function Avatar({ name, image, size = "md" }: { name: string, image?: string | null, size?: "sm" | "md" }) {
   const initial = name ? name.charAt(0).toUpperCase() : "?";
-  const sizeClass = size === "sm" ? "w-5 h-5 text-[10px]" : "w-8 h-8 text-xs";
+  const sizeClass = size === "sm" ? "w-5 h-5 text-xs" : "w-8 h-8 text-xs";
   return (
     <div className={`rounded-none bg-slate-200 text-slate-700 flex items-center justify-center font-bold ${sizeClass} overflow-hidden border border-slate-300`} title={name}>
       {image ? <img src={image} alt={name} className="w-full h-full object-cover" /> : initial}
@@ -88,6 +88,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
       points: task.points,
       dueDate: task.dueDate,
       status: task.status,
+      assignedTo: task.assignedTo,
       [field]: value
     };
     await updateTask(task.id, data);
@@ -214,12 +215,14 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
               <div className="flex flex-wrap gap-2">
                 {tenantUsers.map((tu: any) => {
                   const isSelected = selectedCollabIds.includes(tu.user.id);
+                  const activeStyle = "border-emerald-500 bg-emerald-100 text-emerald-950";
+                  const inactiveStyle = "border-slate-300 bg-white text-slate-700 hover:bg-slate-100";
                   return (
                     <button
                       type="button"
                       key={tu.user.id}
                       onClick={() => handleToggleCollab(tu.user.id)}
-                      className={`flex items-center gap-2 px-2 py-1 text-sm border transition-colors ${isSelected ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100'}`}
+                      className={`flex items-center gap-2 px-2 py-1 text-sm border transition-colors ${isSelected ? activeStyle : inactiveStyle}`}
                     >
                       <Avatar name={tu.user.name || "Usuario"} image={tu.user.image} size="sm" />
                       {tu.user.name}
@@ -262,7 +265,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
                 { value: "DONE", label: "Completada" }
               ]} 
             />
-            <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+            <p className="text-xs text-slate-500 mt-1 leading-tight">
               El progreso de microtareas es informativo. Cambia el estado manualmente.
             </p>
           </div>
@@ -274,6 +277,18 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
             options={[
               { value: "", label: "Sin Categoría" },
               ...categories.map((c: any) => ({ value: c.id, label: c.name }))
+            ]} 
+          />
+          <Select 
+            label="Responsable" 
+            name="assignedTo" 
+            defaultValue={task.assignedTo || ""}
+            onChange={(e) => startTransition(() => handleUpdateField("assignedTo", e.target.value))}
+            options={[
+              ...tenantUsers.map((tu: any) => ({
+                value: tu.user.id,
+                label: tu.user.name || "Usuario del equipo"
+              }))
             ]} 
           />
           <Input 
@@ -370,7 +385,7 @@ export default function TaskDetailModal({ task, categories, tenantUsers = [], is
                   
                   {/* Selector de Asignación */}
                   <div className="flex items-center gap-2 pl-7">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">Asignado:</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase">Asignado:</span>
                     <select
                       className="text-xs border border-slate-200 bg-white p-1 outline-none text-slate-600"
                       value={st.assignedToUserId || ""}

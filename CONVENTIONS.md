@@ -20,6 +20,7 @@
 *   **Indicador de Organización Activa:** El componente debe estar visible siempre en el Navbar.
 
 ## 3. Arquitectura y Patrones de Código
+*   **Planificación Previa Obligatoria:** SIEMPRE se debe presentar y validar un plan detallado antes de realizar cualquier cambio en el código.
 *   Todo el mutado de estado debe realizarse vía Server Actions en `src/features/<modulo>/actions.ts`.
 *   Toda acción debe verificar `tenantId` antes de ejecutar cambios, leyendo exclusivamente de la sesión segura del servidor.
 *   Uso de componentes UI compartidos de `src/components/ui/` es obligatorio.

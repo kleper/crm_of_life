@@ -11,7 +11,9 @@ import {
   getTeamRanking,
   getContactsPendingFollowUp,
   getFinanceMonthBalance,
-  getOrgCollaborationStats
+  getOrgCollaborationStats,
+  getAssignedPendingTasks,
+  getTenantMembers
 } from "@/features/dashboard/queries";
 import { getOrganizationGeneralSettings } from "@/features/settings/general/actions";
 import { getKudoSummary, getPublicKudoWall } from "@/features/kudos/actions";
@@ -57,7 +59,9 @@ export default async function DashboardPage() {
     publicKudoWall,
     tenant,
     taskCategories,
-    financeCategories
+    financeCategories,
+    assignedTasks,
+    tenantMembers
   ] = await Promise.all([
     getProductivitySummary(userId, currentTenantId),
     getGamificationProgress(userId, currentTenantId),
@@ -72,7 +76,9 @@ export default async function DashboardPage() {
     getPublicKudoWall(currentTenantId, 5),
     getOrganizationGeneralSettings(),
     getCategories(),
-    getFinanceCategories()
+    getFinanceCategories(),
+    getAssignedPendingTasks(userId, currentTenantId),
+    getTenantMembers(currentTenantId)
   ]);
 
   return (
@@ -92,6 +98,9 @@ export default async function DashboardPage() {
         currency={tenant?.currency || "USD"}
         taskCategories={taskCategories}
         financeCategories={financeCategories}
+        assignedTasks={assignedTasks}
+        tenantMembers={tenantMembers}
+        currentUserId={userId}
       />
     </div>
   );
