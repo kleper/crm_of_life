@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-01T17:11:00Z",
+  "title": "Design System: CRM de la Vida",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Cadence Indigo",
+        "canonical": "oklch(54% 0.24 275)",
+        "tonalRamp": ["#312e81", "#3730a3", "#4338ca", "#4f46e5", "#6366f1", "#818cf8", "#c7d2fe", "#e0e7ff"]
+      },
+      "primary-dark": {
+        "role": "primary",
+        "displayName": "Obsidian Slate",
+        "canonical": "oklch(20% 0.03 260)",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Action Blue",
+        "canonical": "oklch(55% 0.22 250)",
+        "tonalRamp": ["#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe", "#dbeafe"]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Momentum Emerald",
+        "canonical": "oklch(70% 0.18 150)",
+        "tonalRamp": ["#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#a7f3d0", "#d1fae5"]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "System Amber",
+        "canonical": "oklch(75% 0.18 80)",
+        "tonalRamp": ["#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fde68a", "#fef3c7"]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Signal Red",
+        "canonical": "oklch(55% 0.22 25)",
+        "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fee2e2"]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Clarity Slate",
+        "canonical": "oklch(98% 0.005 240)",
+        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Pure Surface",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": ["#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc", "#fafafa", "#ffffff"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Structural Border",
+        "canonical": "oklch(92% 0.01 240)",
+        "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc"]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Obsidian Text",
+        "canonical": "oklch(20% 0.03 260)",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1"]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Subtext Slate",
+        "canonical": "oklch(55% 0.02 240)",
+        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page titles and major metrics." },
+      "headline": { "displayName": "Headline", "purpose": "Card titles and modal headers." },
+      "title": { "displayName": "Title", "purpose": "Sub-headers and row labels." },
+      "body": { "displayName": "Body", "purpose": "Paragraphs and field text." },
+      "label": { "displayName": "Label", "purpose": "Badges, tabs, and column metadata." }
+    },
+    "shadows": [
+      { "name": "flat-resting", "value": "none", "purpose": "Default planar state on all surfaces." },
+      { "name": "modal-backdrop", "value": "0 20px 25px -5px rgba(0, 0, 0, 0.2)", "purpose": "Modal dialog elevation over dark backdrop." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default transition for color and border hover." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-min", "value": "320px" },
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "High-contrast obsidian action button for form submissions and primary actions.",
+      "html": "<button class=\"ds-btn-primary\">GUARDAR TAREA</button>",
+      "css": ".ds-btn-primary { background: #0f172a; color: #ffffff; min-height: 44px; padding: 8px 24px; font-weight: 500; font-size: 14px; border: none; border-radius: 0px; cursor: pointer; transition: background 0.2s ease; display: inline-flex; align-items: center; justify-content: center; } .ds-btn-primary:hover { background: #1e293b; } .ds-btn-primary:focus-visible { outline: 2px solid #0f172a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Accent Button",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "Vibrant Cadence Indigo button for new entity creation and focal actions.",
+      "html": "<button class=\"ds-btn-accent\">NUEVA TAREA</button>",
+      "css": ".ds-btn-accent { background: #4f46e5; color: #ffffff; min-height: 44px; padding: 8px 24px; font-weight: 500; font-size: 14px; border: none; border-radius: 0px; cursor: pointer; transition: background 0.2s ease; display: inline-flex; align-items: center; justify-content: center; } .ds-btn-accent:hover { background: #4338ca; } .ds-btn-accent:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Bordered white button for neutral or dismissive secondary actions.",
+      "html": "<button class=\"ds-btn-secondary\">CANCELAR</button>",
+      "css": ".ds-btn-secondary { background: #ffffff; color: #334155; min-height: 44px; padding: 8px 24px; font-weight: 500; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 0px; cursor: pointer; transition: background 0.2s ease; display: inline-flex; align-items: center; justify-content: center; } .ds-btn-secondary:hover { background: #f8fafc; } .ds-btn-secondary:focus-visible { outline: 2px solid #64748b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Standard Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Flat white container with 1px border for dashboard metrics, kanban items, and lists.",
+      "html": "<div class=\"ds-card\"><h4 class=\"ds-card-title\">Resumen de Hoy</h4><p class=\"ds-card-text\">3 tareas pendientes, racha de 5 días activa.</p></div>",
+      "css": ".ds-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0px; padding: 20px; } .ds-card-title { font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0; } .ds-card-text { font-size: 14px; color: #64748b; margin: 0; }"
+    },
+    {
+      "name": "Form Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Standard single-line text input field with high contrast border.",
+      "html": "<div class=\"ds-input-wrapper\"><label class=\"ds-input-label\">Título de la Tarea</label><input type=\"text\" class=\"ds-input\" placeholder=\"Ej. Revisar balance mensual\" /></div>",
+      "css": ".ds-input-wrapper { display: flex; flex-direction: column; gap: 4px; } .ds-input-label { font-size: 14px; font-weight: 500; color: #334155; } .ds-input { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 0px; padding: 10px 12px; font-size: 14px; color: #0f172a; min-height: 44px; outline: none; } .ds-input:focus { border-color: #4f46e5; outline: 2px solid #4f46e5; outline-offset: -1px; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Compact uppercase badge for task statuses, streak counts, and categories.",
+      "html": "<span class=\"ds-badge ds-badge-success\">COMPLETADA</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 8px; border-radius: 0px; } .ds-badge-success { background: #d1fae5; color: #047857; }"
+    },
+    {
+      "name": "Empty State",
+      "kind": "custom",
+      "refersTo": "empty-state",
+      "description": "Active empty placeholder ensuring lists are never ambiguous or unguided.",
+      "html": "<div class=\"ds-empty\"><p class=\"ds-empty-title\">Sin tareas pendientes</p><p class=\"ds-empty-desc\">Todo al día por aquí. Crea una nueva tarea para continuar tu racha.</p><button class=\"ds-btn-accent\">NUEVA TAREA</button></div>",
+      "css": ".ds-empty { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0px; padding: 32px 24px; text-align: center; } .ds-empty-title { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0; } .ds-empty-desc { font-size: 14px; color: #64748b; margin: 0 0 20px 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Precision Instrument",
+    "overview": "CRM de la Vida is engineered as a high-clarity utilitarian cockpit. It is calibrated for calm focus, cognitive ease, and daily execution momentum across personal habits, professional projects, relationships, and financial records. Visual noise is treated as operational friction. Every boundary is honest, structural, and unadorned.\n\nThe visual system is intentionally grounded in strict flat design and high-contrast light surfaces to support neurodivergent accessibility. By eliminating ambient shadows, heavy gradients, and rounded borders, the interface minimizes sensory overload and allows the user's attention to rest entirely on the task at hand. The system is planar, predictable, and tactile.",
+    "keyCharacteristics": [
+      "Uncompromising flat geometry (rounded-none across every surface, control, and container)",
+      "Calibrated, high-contrast light palette (bg-slate-50 canvas, crisp white cards, solid slate borders)",
+      "Deliberate semantic color allocation (Cadence Indigo for interaction, Momentum Emerald for streaks, System Amber for admin/points)",
+      "Active empty states ensuring no view ever feels abandoned or broken",
+      "Generous touch targets (minimum 44px) built mobile-first"
+    ],
+    "rules": [
+      {
+        "name": "The Rarity Rule",
+        "body": "Primary accent colors (Cadence Indigo and Momentum Emerald) are reserved strictly for interactive state and completion signals. They never coat large passive background surfaces.",
+        "section": "colors"
+      },
+      {
+        "name": "The Light Horizon Rule",
+        "body": "Content surfaces must remain strictly within the slate-50 to white spectrum. Absolute dark themes on content surfaces are prohibited to maintain neurodivergent calm and readability.",
+        "section": "colors"
+      },
+      {
+        "name": "The Uppercase Meta Rule",
+        "body": "System badges, status pills, and organization context indicators are set in bold uppercase with expanded letter-spacing (0.05em) to differentiate metadata from user content at a glance.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-Plane Rule",
+        "body": "Surfaces are strictly planar. Ambient drop shadows are forbidden. Depth is defined by borders and background contrast alone.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Zero-Radius Rule",
+        "body": "Every container, button, card, modal, badge, avatar, and input has exactly 0px border radius across all viewports.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do use rounded-none on every component, card, button, and badge without exception.",
+      "Do ensure all clickable and interactive elements have a minimum height of 44px (min-h-[44px]).",
+      "Do verify interfaces at 320px viewport width to guarantee no horizontal window overflow.",
+      "Do provide an <EmptyState> with a clear call-to-action for every empty data list.",
+      "Do use uppercase bold text with expanded tracking (tracking-wider) on badges and meta labels.",
+      "Do keep content backgrounds on the slate-50 to white spectrum (bg-slate-50, bg-white)."
+    ],
+    "donts": [
+      "Don't use border radius of any value (rounded-sm, rounded-md, rounded-full are strictly prohibited).",
+      "Don't use ambient blur drop shadows (shadow-lg, shadow-xl, shadow-2xl) on resting content cards.",
+      "Don't create dark-mode content surfaces (bg-slate-900, bg-black) for content areas.",
+      "Don't rely on color alone to convey state; pair colors with icons or descriptive text.",
+      "Don't allow full-page horizontal scrolling; contain tabular or Kanban scrolling within dedicated containers (overflow-x-auto)."
+    ]
+  }
+}

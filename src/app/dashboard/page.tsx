@@ -15,6 +15,8 @@ import {
 } from "@/features/dashboard/queries";
 import { getOrganizationGeneralSettings } from "@/features/settings/general/actions";
 import { getKudoSummary, getPublicKudoWall } from "@/features/kudos/actions";
+import { getCategories } from "@/features/tasks/actions";
+import { getFinanceCategories } from "@/features/finance/actions";
 
 export const metadata = {
   title: 'Dashboard | CRM de la Vida',
@@ -53,7 +55,9 @@ export default async function DashboardPage() {
     collaborationStats,
     kudoSummary,
     publicKudoWall,
-    tenant
+    tenant,
+    taskCategories,
+    financeCategories
   ] = await Promise.all([
     getProductivitySummary(userId, currentTenantId),
     getGamificationProgress(userId, currentTenantId),
@@ -66,7 +70,9 @@ export default async function DashboardPage() {
     getOrgCollaborationStats(currentTenantId),
     getKudoSummary(userId, currentTenantId),
     getPublicKudoWall(currentTenantId, 5),
-    getOrganizationGeneralSettings()
+    getOrganizationGeneralSettings(),
+    getCategories(),
+    getFinanceCategories()
   ]);
 
   return (
@@ -84,6 +90,8 @@ export default async function DashboardPage() {
         kudoSummary={kudoSummary}
         publicKudoWall={publicKudoWall}
         currency={tenant?.currency || "USD"}
+        taskCategories={taskCategories}
+        financeCategories={financeCategories}
       />
     </div>
   );
