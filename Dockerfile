@@ -44,7 +44,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 # Copy bcryptjs for the seeding script (standalone trace misses it)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
-# Fix npm cache permissions for npx commands in production (e.g. npx prisma migrate)
+# Copy Prisma CLI and engines for database migration and schema commands in production
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+
+# Expose local node_modules/.bin in PATH and fix npm cache permissions
+ENV PATH="/app/node_modules/.bin:${PATH}"
 ENV npm_config_cache=/tmp
 
 USER nextjs
