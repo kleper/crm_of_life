@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { getApiKeys } from "@/features/api-keys/actions";
+import { getApiKeysQuery } from "@/features/api-keys/queries";
 import { ApiKeysManager } from "@/features/api-keys/components/ApiKeysManager";
 
 export const metadata = {
@@ -15,7 +15,20 @@ export default async function ApiSettingsPage() {
     redirect("/login");
   }
 
-  const keys = await getApiKeys();
+  const userId = session.user.id as string;
+  const currentTenantId = (session.user as any).selectedTenantId;
+
+  if (!currentTenantId) {
+    redirect("/select-tenant");
+  }
+
+  let keys: any[] = [];
+  try {
+    keys = await getApiKeysQuery(userId, currentTenantId);
+  } catch (err) {
+    console.error("[ApiSettingsPage] Error fetching keys:", err);
+    keys = [];
+  }
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-6">

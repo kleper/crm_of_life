@@ -7,38 +7,22 @@ import { generateApiKey } from "@/lib/api-auth";
 
 const prisma = new PrismaClient();
 
+import { getApiKeysQuery } from "./queries";
+
 export async function getApiKeys() {
   const session = await auth();
   if (!session?.user) {
-    throw new Error("No autenticado");
+    return [];
   }
 
   const currentTenantId = (session.user as any).selectedTenantId;
   const userId = session.user.id as string;
 
-  if (!currentTenantId) {
+  if (!currentTenantId || !userId) {
     return [];
   }
 
-  const keys = await prisma.apiKey.findMany({
-    where: {
-      tenantId: currentTenantId,
-      userId: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      keyPrefix: true,
-      createdAt: true,
-      lastUsedAt: true,
-      expiresAt: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return keys;
+  return getApiKeysQuery(userId, currentTenantId);
 }
 
 export async function createApiKeyAction(name: string, expiresDays?: number) {
@@ -94,7 +78,12 @@ export async function createApiKeyAction(name: string, expiresDays?: number) {
   return {
     success: true,
     plaintextKey,
-    key: newKey,
+    key: {
+      ...newKey,
+      createdAt: newKey.createdAt instanceof Date ? newKey.createdAt.toISOString() : String(newKey.createdAt),
+      lastUsedAt: newKey.lastUsedAt ? (newKey.lastUsedAt instanceof Date ? newKey.lastUsedAt.toISOString() : String(newKey.lastUsedAt)) : null,
+      expiresAt: newKey.expiresAt ? (newKey.expiresAt instanceof Date ? newKey.expiresAt.toISOString() : String(newKey.expiresAt)) : null,
+    },
   };
 }
 
