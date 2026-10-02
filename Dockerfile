@@ -1,5 +1,5 @@
 FROM node:20-bookworm-slim AS base
-RUN npm install -g npm@11.17.0
+RUN npm install -g npm@11.17.0 prisma@6.19.3
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies only when needed
@@ -44,13 +44,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 # Copy bcryptjs for the seeding script (standalone trace misses it)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
-# Copy Prisma CLI and engines for database migration and schema commands in production
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
-
-# Expose local node_modules/.bin in PATH and fix npm cache permissions
-ENV PATH="/app/node_modules/.bin:${PATH}"
+# Fix npm cache permissions for npx commands in production (e.g. npx prisma migrate)
 ENV npm_config_cache=/tmp
 
 USER nextjs
