@@ -50,6 +50,7 @@ model Tenant {
   financeCategories FinanceCategory[]
   transactions     Transaction[]
   kudos            Kudo[]
+  apiKeys          ApiKey[]
   timezone         String            @default("America/Bogota")
   country          String?
   currency         String            @default("USD")
@@ -98,6 +99,7 @@ model User {
   completedSubtasks  Subtask[]         @relation("SubtaskCompletedBy")
   kudosSent          Kudo[]            @relation("KudoSender")
   kudosReceived      Kudo[]            @relation("KudoReceiver")
+  apiKeys            ApiKey[]
   notificationSoundsEnabled Boolean    @default(true)
 }
 
@@ -487,3 +489,27 @@ model Kudo {
   @@index([organizationId])
   @@index([toUserId])
 }
+
+// ==========================================
+// MÓDULO DE INTEGRACIONES Y CLAVES API
+// ==========================================
+
+model ApiKey {
+  id          String    @id @default(uuid())
+  name        String
+  keyHash     String    @unique
+  keyPrefix   String
+  userId      String
+  tenantId    String
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([keyHash])
+  @@index([tenantId, userId])
+}
+

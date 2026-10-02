@@ -86,6 +86,29 @@ export default function ProfileClient({ initialName, initialEmail, initialSounds
         </div>
       </Card>
 
+      <Card noPadding className="bg-white">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <h3 className="font-bold text-slate-900">Integraciones & Desarrolladores</h3>
+          <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5">REST & MCP</span>
+        </div>
+        <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-bold text-slate-900">Claves de API Personales</div>
+            <div className="text-xs text-slate-500 mt-1 max-w-md">
+              Genera tokens Bearer para conectar clientes MCP (Claude Desktop, Cursor) o aplicaciones externas vía OpenAPI.
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="/settings/api"
+              className="px-4 py-2 min-h-[44px] text-xs font-bold uppercase tracking-wider bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center justify-center"
+            >
+              Gestionar Claves
+            </a>
+          </div>
+        </div>
+      </Card>
+
       <div className="mt-8">
         <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Créditos de Audio</h4>
         <p className="text-xs text-slate-500 leading-relaxed">

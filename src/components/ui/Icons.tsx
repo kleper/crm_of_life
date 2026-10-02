@@ -310,6 +310,69 @@ export function Rocket(props: IconProps) {
   );
 }
 
+export function Key(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="m21 2-2 2m-1.5 1.5L12 11a5 5 0 1 0 4.24 7.24L20 14h2v-2h2v-2l-2-2z" />
+      <circle cx="7.5" cy="16.5" r="1.5" />
+    </Icon>
+  );
+}
+
+export function BookOpen(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </Icon>
+  );
+}
+
+export function Code(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </Icon>
+  );
+}
+
+export function Cpu(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="4" y="4" width="16" height="16" />
+      <rect x="9" y="9" width="6" height="6" />
+      <path d="M15 2v2" />
+      <path d="M15 20v2" />
+      <path d="M2 15h2" />
+      <path d="M2 9h2" />
+      <path d="M20 15h2" />
+      <path d="M20 9h2" />
+      <path d="M9 2v2" />
+      <path d="M9 20v2" />
+    </Icon>
+  );
+}
+
+export function ExternalLink(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </Icon>
+  );
+}
+
+export function Lock(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="11" width="18" height="11" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </Icon>
+  );
+}
+
 // Export all icons as a namespace
 const Icons = {
   Dashboard,
@@ -341,6 +404,13 @@ const Icons = {
   Mail,
   Phone,
   Rocket,
+  Key,
+  BookOpen,
+  Code,
+  Cpu,
+  ExternalLink,
+  Lock,
 };
 
 export default Icons;
+
