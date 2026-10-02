@@ -174,9 +174,9 @@ export function ApiKeysManager({ initialKeys }: ApiKeysManagerProps) {
                       <span className="bg-slate-100 px-2 py-0.5 border border-slate-200 text-slate-700">
                         {k.keyPrefix}
                       </span>
-                      <span>Creada: {createdDate}</span>
+                      <span suppressHydrationWarning>Creada: {createdDate}</span>
                       <span className="hidden md:inline">•</span>
-                      <span className="hidden md:inline">Último uso: {lastUsedStr}</span>
+                      <span suppressHydrationWarning className="hidden md:inline">Último uso: {lastUsedStr}</span>
                     </div>
                   </div>
 
